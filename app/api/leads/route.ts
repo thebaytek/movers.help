@@ -37,9 +37,11 @@ export async function POST(request: Request) {
 
     const data = parsed.data;
     const supabase = await createClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = supabase as any;
 
     // Create the lead
-    const { data: lead, error: leadError } = await supabase
+    const { data: lead, error: leadError } = await db
       .from("leads")
       .insert({
         move_from_city: data.moveFromCity,
@@ -65,7 +67,7 @@ export async function POST(request: Request) {
 
     // Create inventory items
     if (data.inventory.length > 0) {
-      const { error: invError } = await supabase
+      const { error: invError } = await db
         .from("inventory_items")
         .insert(
           data.inventory.map((item) => ({

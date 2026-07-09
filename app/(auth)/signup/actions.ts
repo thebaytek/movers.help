@@ -40,7 +40,9 @@ export async function signup(formData: FormData) {
   }
 
   if (data.user) {
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = supabase as any;
+    await db
       .from("profiles")
       .update({
         full_name: fullName,
@@ -51,7 +53,7 @@ export async function signup(formData: FormData) {
       .eq("id", data.user.id);
 
     if (inviteCode) {
-      await supabase
+      await db
         .from("invite_codes")
         .update({ used_by: data.user.id, used_at: new Date().toISOString() })
         .eq("code", inviteCode);

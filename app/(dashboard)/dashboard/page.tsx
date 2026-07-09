@@ -69,7 +69,7 @@ function StatCard({
   label,
   value,
 }: {
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
 }) {
@@ -322,8 +322,8 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="hidden lg:block w-24 text-sm text-surface-600 dark:text-surface-400">
-                          {lead.total_cu_ft > 0
-                            ? `${formatNumber(lead.total_cu_ft)} cu ft`
+                          {(lead.total_cu_ft ?? 0) > 0
+                            ? `${formatNumber(lead.total_cu_ft ?? 0)} cu ft`
                             : "—"}
                         </div>
 
@@ -403,10 +403,10 @@ export default function DashboardPage() {
                           <div>
                             <h4 className="text-xs font-semibold uppercase tracking-wider text-surface-400 dark:text-surface-500 mb-3">
                               Inventory
-                              {lead.total_items > 0 && (
+                              {(lead.total_items ?? 0) > 0 && (
                                 <span className="font-normal normal-case ml-1">
                                   ({lead.total_items} items,{" "}
-                                  {formatNumber(lead.total_cu_ft)} cu ft)
+                                  {formatNumber(lead.total_cu_ft ?? 0)} cu ft)
                                 </span>
                               )}
                             </h4>
@@ -430,15 +430,15 @@ export default function DashboardPage() {
                                           >
                                             <span className="text-surface-700 dark:text-surface-300">
                                               {item.item}
-                                              {item.quantity > 1 && (
+                                              {(item.quantity ?? 1) > 1 && (
                                                 <span className="text-surface-400 ml-1">
                                                   x{item.quantity}
                                                 </span>
                                               )}
                                             </span>
                                             <span className="text-surface-500 dark:text-surface-400 text-xs tabular-nums">
-                                              {item.cu_ft_per_item *
-                                                item.quantity}{" "}
+                                              {(item.cu_ft_per_item ?? 0) *
+                                                (item.quantity ?? 0)}{" "}
                                               cu ft
                                             </span>
                                           </div>

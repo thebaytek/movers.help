@@ -10,13 +10,17 @@ type CookieSetter = {
 
 function createCookieMethods(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   return {
-    getAll() {
-      return cookieStore.getAll();
+    getAll(): { name: string; value: string }[] {
+      return cookieStore.getAll() as { name: string; value: string }[];
     },
     setAll(cookiesToSet: CookieSetter[]) {
-      cookiesToSet.forEach(({ name, value, options }) => {
-        cookieStore.set(name, value, options);
-      });
+      try {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          cookieStore.set(name, value, options);
+        });
+      } catch {
+        // Ignore cookie errors in non-request contexts
+      }
     },
   };
 }

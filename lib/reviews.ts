@@ -26,11 +26,12 @@ export async function getReviewStats() {
     .select("rating")
     .eq("is_verified", true);
 
-  if (error || !data.length) {
+  if (error || !data || !data.length) {
     return { averageRating: 5.0, totalReviews: 0 };
   }
 
-  const sum = data.reduce((acc, r) => acc + r.rating, 0);
+  const ratings = data as { rating: number }[];
+  const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
   return {
     averageRating: Math.round((sum / data.length) * 10) / 10,
     totalReviews: data.length,

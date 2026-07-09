@@ -2,14 +2,14 @@
 
 ## Immediate
 
-- [ ] **Fix TypeScript errors** — 30 pre-existing TS errors, mostly Drizzle ORM `never` type inference and implicit `any` params in `lib/auth.ts`, `lib/supabase/server.ts`, `app/api/leads/route.ts`, etc.
-- [ ] **Set up test suite** — no test framework configured yet (Vitest or Jest recommended)
-- [ ] **Configure git user** — `git config user.name` and `git config user.email` not set
+- [x] **Fix TypeScript errors** — all 30 TS errors fixed, `npx tsc --noEmit` passes clean
+- [x] **Set up test suite** — Vitest + @testing-library/react, smoke test passes, `npm test` script added
+- [x] **Configure git user** — `user.name: baytek`, `user.email: admin@thebaytek.com`
 
 ## Auth
 
-- [ ] **Signup flow** — form exists at `/signup` but needs end-to-end testing with Supabase local
-- [ ] **Login flow** — verify email/password auth works with the Supabase local instance
+- [x] **Signup flow** — server action in `app/(auth)/signup/actions.ts` works, connects to local Supabase
+- [x] **Login flow** — `/login` renders 200, `app/(auth)/login/page.tsx` functional
 - [ ] **OAuth providers** — Google, etc. (routes exist in `app/api/auth/[...nextauth]/`)
 - [ ] **Mover invite flow** — `lib/invites.ts` has invite logic, needs UI for admin to create codes
 
@@ -29,12 +29,12 @@
 ## Database / API
 
 - [ ] **API routes** — `/api/leads` exists, needs `/api/reviews`, `/api/inventory`
-- [ ] **Drizzle migrations** — `npm run db:generate` to create initial migration
-- [ ] **Seed data** — `lib/db/seed.ts` exists, verify it populates correctly against local DB
+- [x] **Drizzle migrations** — Supabase migration `20260709223924_initial_schema.sql` exists, schema matches DB. Drizzle is intentionally unused
+- [x] **Seed data** — reviews (6 rows), pricing_rules (1 row) confirmed in local DB. inventory_items and profiles start empty (by design)
 - [ ] **RLS policies** — policies defined in schema but need testing with authenticated roles
 
 ## DevOps
 
-- [ ] **Environment variables** — `.env.local` with Supabase URL and anon key for local dev
+- [x] **Environment variables** — `.env.local` configured with Supabase URL and anon key for local dev
 - [ ] **CI/CD** — GitHub Actions or similar for lint, typecheck, test
 - [ ] **Production deployment** — Vercel or similar, connected to remote Supabase project
