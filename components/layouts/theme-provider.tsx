@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       })();
     `;
     document.head.appendChild(script);
-    return () => document.head.removeChild(script);
+    return () => { document.head.removeChild(script); };
   }, []);
 
   return <>{children}</>;
