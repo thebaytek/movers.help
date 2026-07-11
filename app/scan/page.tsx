@@ -139,6 +139,14 @@ export default function ScanPage() {
         </div>
       )}
 
+      {/* Cu ft counter */}
+      {session && session.confirmedItems.length > 0 && (
+        <div className="absolute top-4 right-4 z-30 bg-slate-900/85 backdrop-blur-md rounded-xl border border-cyan-400/20 px-4 py-2">
+          <p className="text-[10px] uppercase tracking-wider text-slate-500">Total</p>
+          <p className="text-lg font-bold text-cyan-400">{session.totalCuFt} <span className="text-xs font-normal text-slate-400">cu ft</span></p>
+        </div>
+      )}
+
       {/* Room summary */}
       {session && session.confirmedItems.length > 0 && (
         <div className="absolute bottom-20 left-4 z-20 bg-slate-900/85 backdrop-blur-md rounded-xl border border-white/[0.06] p-3 max-w-[180px]">
