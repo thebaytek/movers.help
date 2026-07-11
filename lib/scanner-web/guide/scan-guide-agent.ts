@@ -169,6 +169,3 @@ export class ScanGuideAgent {
     this.alertedBulky.clear();
   }
 }
-      totalCuFt: this.totalCuFt,
-    };
-  }
