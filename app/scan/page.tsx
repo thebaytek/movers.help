@@ -21,6 +21,8 @@ export default function ScanPage() {
   const [session, setSession] = useState<ScannerSession | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentRoom, setCurrentRoom] = useState("Living Room");
+  const ROOMS = ["Living Room", "Kitchen", "Bedroom", "Bathroom", "Office", "Garage", "Other"];
 
   useEffect(() => {
     const scanner = createWebScanner();
@@ -38,6 +40,7 @@ export default function ScanPage() {
             setLoading(false);
           }
         });
+        scanner.setRoom("Living Room");
       } catch (e) {
         if (mounted) {
           setError(e instanceof Error ? e.message : "Camera failed");
@@ -59,6 +62,28 @@ export default function ScanPage() {
 
   return (
     <main className="relative h-screen bg-[#0B1120] overflow-hidden">
+      {/* Room picker */}
+      <div className="absolute top-4 left-0 right-0 z-30 flex justify-center pointer-events-none">
+        <div className="flex gap-1.5 overflow-x-auto px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-full border border-white/[0.06] max-w-full pointer-events-auto">
+          {ROOMS.map((room) => (
+            <button
+              key={room}
+              onClick={() => {
+                setCurrentRoom(room);
+                scannerRef.current?.setRoom(room);
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                currentRoom === room
+                  ? "bg-cyan-400 text-[#0B1120]"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]"
+              }`}
+            >
+              {room}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Camera container */}
       <div ref={containerRef} className="absolute inset-0" />
 
@@ -109,8 +134,26 @@ export default function ScanPage() {
       {session && !error && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-slate-800/85 px-4 py-2 rounded-lg z-20">
           <p className="text-xs font-semibold" style={{ color: badgeColor }}>
-            {badgeLabel} · {session.detections.length} detected
+            {badgeLabel} · {session.detections.length} active · {session.confirmedItems.length} confirmed
           </p>
+        </div>
+      )}
+
+      {/* Room summary */}
+      {session && session.confirmedItems.length > 0 && (
+        <div className="absolute bottom-20 left-4 z-20 bg-slate-900/85 backdrop-blur-md rounded-xl border border-white/[0.06] p-3 max-w-[180px]">
+          <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2">Rooms</p>
+          {session.roomSummary.slice(0, 5).map((r) => (
+            <div key={r.room} className="flex justify-between items-center py-0.5">
+              <span className="text-[11px] text-slate-300 truncate mr-2">{r.room}</span>
+              <span className="text-[11px] text-slate-500">{r.itemCount}</span>
+            </div>
+          ))}
+          {session.roomSummary.length > 5 && (
+            <p className="text-[10px] text-slate-600 mt-1">
+              +{session.roomSummary.length - 5} more
+            </p>
+          )}
         </div>
       )}
 
