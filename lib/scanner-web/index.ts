@@ -28,3 +28,10 @@ export { VolumeCalculator } from "./geometry/volume-calculator";
 export type { VolumeEstimate, VolumeCalculatorConfig } from "./geometry/volume-calculator";
 export { BboxDepthEstimator, createDepthEstimator } from "./backends/depth-estimator";
 export type { IDepthEstimator, DepthResult } from "./backends/depth-estimator";
+
+// Scan guide (Phase 4)
+export { ScanGuideAgent } from "./guide/scan-guide-agent";
+export type { GuideState, GuideEvent } from "./guide/scan-guide-agent";
+export { speak, stopSpeaking, isSpeaking } from "./guide/speech";
+export { getBulkyRule, BULKY_RULES } from "./guide/bulky-rules";
+export type { BulkyRule } from "./guide/bulky-rules";

@@ -101,3 +101,52 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+const patchSchema = z.object({
+  leadId: z.string().uuid(),
+  status: z.enum(["new", "contacted", "quoted", "booked", "completed", "closed"]).optional(),
+  moverId: z.string().uuid().nullable().optional(),
+  notes: z.string().optional(),
+});
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const parsed = patchSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid data", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { leadId, ...updates } = parsed.data;
+    const supabase = await createClient();
+    const db = supabase as any;
+
+    // Map camelCase to snake_case for DB
+    const dbUpdates: Record<string, unknown> = {};
+    if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.moverId !== undefined) dbUpdates.mover_id = updates.moverId;
+    if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+    dbUpdates.updated_at = new Date().toISOString();
+
+    const { data: lead, error } = await db
+      .from("leads")
+      .update(dbUpdates)
+      .eq("id", leadId)
+      .select()
+      .single();
+
+    if (error || !lead) {
+      console.error("Failed to update lead:", error);
+      return NextResponse.json({ error: "Failed to update lead" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, lead }, { status: 200 });
+  } catch (error) {
+    console.error("Lead PATCH error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

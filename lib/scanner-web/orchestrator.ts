@@ -2,6 +2,7 @@ import { startWebCamera, stopWebCamera, type WebCamera } from "./camera";
 import { createDetector } from "./backends/create-detector";
 import { runDetectionLoop } from "./detection-loop";
 import { InventoryManager } from "./inventory-state";
+import { ScanGuideAgent, type GuideEvent } from "./guide/scan-guide-agent";
 import type {
   DetectorBackend,
   IWebDetector,
@@ -25,6 +26,7 @@ function emptySession(
     confirmedItems: [],
     totalCuFt: 0,
     roomSummary: [],
+    guide: null,
   };
 }
 
@@ -39,6 +41,8 @@ export function createWebScanner(options?: WebScannerOptions): WebScanner {
   let onUpdate: ((s: ScannerSession) => void) | null = null;
 
   const inventory = new InventoryManager();
+  const guide = new ScanGuideAgent();
+  let lastConfirmedCount = 0;
 
   const emit = () => {
     onUpdate?.(session);
@@ -55,22 +59,19 @@ export function createWebScanner(options?: WebScannerOptions): WebScanner {
         backend: detector.backend,
       };
       await inventory.initDepth();
+      session = { ...session, guide: guide.onInit() };
       emit();
     },
 
     async startCamera(container: HTMLElement): Promise<void> {
-      if (!detector) {
-        throw new Error("Scanner not initialized");
-      }
+      if (!detector) throw new Error("Scanner not initialized");
       camera = await startWebCamera(container);
       session = { ...session, status: "scanning" };
       emit();
     },
 
     startScanning(callback: (s: ScannerSession) => void): void {
-      if (!detector || !camera) {
-        throw new Error("Camera not started");
-      }
+      if (!detector || !camera) throw new Error("Camera not started");
 
       onUpdate = callback;
 
@@ -79,19 +80,51 @@ export function createWebScanner(options?: WebScannerOptions): WebScanner {
           raw,
           performance.now(),
         );
+
+        // Feed new confirmations to guide agent
+        let guideEvent: GuideEvent | undefined;
+        if (newConfirmations.length > 0) {
+          for (const item of newConfirmations) {
+            guideEvent = guide.onItemConfirmed(
+              item.inventoryLabel,
+              item.class,
+              item.volumeCuFt,
+            );
+          }
+        }
+
         session = {
           ...session,
           detections: active,
           confirmedItems: inventory.confirmedItems,
-          totalCuFt: inventory.confirmedItems.reduce((sum, item) => sum + item.volumeCuFt, 0),
+          totalCuFt: inventory.confirmedItems.reduce(
+            (sum, item) => sum + item.volumeCuFt,
+            0,
+          ),
           roomSummary: inventory.getRoomSummary(),
+          guide: guideEvent ?? session.guide,
         };
+        lastConfirmedCount = inventory.confirmedItems.length;
         emit();
       });
     },
 
     setRoom(room: string): void {
       inventory.setRoom(room);
+      session = { ...session, guide: guide.onRoomChange(room) };
+      emit();
+    },
+
+    /** Mark current room as done — guide will suggest next room */
+    markRoomDone(): void {
+      session = { ...session, guide: guide.onRoomDone() };
+      emit();
+    },
+
+    /** Get guide to remind user to keep scanning */
+    nudgeGuide(): void {
+      session = { ...session, guide: guide.onIdleTick() };
+      emit();
     },
 
     stopScanning(): void {
@@ -107,6 +140,7 @@ export function createWebScanner(options?: WebScannerOptions): WebScanner {
       }
       detector?.dispose();
       detector = null;
+      guide.reset();
       inventory.reset();
       session = emptySession();
       onUpdate = null;

@@ -60,6 +60,9 @@ export class ScanGuideAgent {
       scannedRooms: Array.from(this.scannedRooms),
       remainingRooms: this.remainingRooms,
       totalItems: this.totalItems,
+      totalCuFt: this.totalCuFt,
+    };
+  }
 
   // ── Public API ──────────────────────────────────────────
 

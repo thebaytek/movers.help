@@ -47,6 +47,7 @@ export interface ScannerSession {
   confirmedItems: WebDetection[];
   totalCuFt: number;
   roomSummary: RoomSummary[];
+  guide: import("./guide/scan-guide-agent").GuideEvent | null;
 }
 
 export interface WebScannerOptions {
@@ -59,6 +60,10 @@ export interface WebScanner {
   startCamera(container: HTMLElement): Promise<void>;
   startScanning(onUpdate: (session: ScannerSession) => void): void;
   setRoom(room: string): void;
+  /** Mark current room as done — guide suggests next room */
+  markRoomDone(): void;
+  /** Nudge guide to remind user to keep scanning */
+  nudgeGuide(): void;
   stopScanning(): void;
   dispose(): void;
 }
