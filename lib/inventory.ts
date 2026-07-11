@@ -1,99 +1,89 @@
-// Cubic footage lookup for common household items
-export const CUBIC_FOOTAGE: Record<string, number> = {
+// Cubic footage lookup table per furniture item.
+// Keys use underscore format for normalization in getCuFt().
+const CUBIC_FOOTAGE: Record<string, number> = {
   // Bedroom
-  "Queen Bed": 60,
-  "King Bed": 70,
-  "Twin Bed": 40,
-  "Dresser": 40,
-  "Nightstand": 10,
-  "Wardrobe": 55,
-  "Mattress (Queen)": 35,
-  "Mattress (King)": 45,
-  "Bed Frame": 25,
-  "Vanity": 20,
+  queen_bed: 60,
+  king_bed: 75,
+  twin_bed: 40,
+  dresser: 25,
+  nightstand: 8,
+  wardrobe: 40,
+  mattress_queen: 35,
+  mattress_king: 45,
+  mattress_twin: 20,
   // Living Room
-  "Sofa (3-Seat)": 60,
-  "Sofa (2-Seat)": 45,
-  "Sectional": 100,
-  "Coffee Table": 15,
-  "TV Stand": 20,
-  "Bookshelf": 30,
-  "Recliner": 30,
-  "Armchair": 25,
-  "TV (55\"+)": 12,
-  "Rug (Large)": 15,
+  sofa_3seater: 50,
+  sofa_2seater: 35,
+  loveseat: 30,
+  coffee_table: 10,
+  tv_stand: 15,
+  bookshelf: 20,
+  armchair: 18,
+  rug_large: 5,
   // Kitchen
-  "Dining Table": 35,
-  "Dining Chair": 8,
-  "Refrigerator": 65,
-  "Microwave": 5,
-  "Dishwasher": 18,
-  "Stove/Oven": 30,
-  "Kitchen Island": 25,
-  "Bar Stool": 8,
+  dining_table: 25,
+  dining_chair: 5,
+  refrigerator: 40,
+  microwave: 3,
+  dishwasher: 15,
+  stove_oven: 20,
   // Office
-  "Desk": 30,
-  "Office Chair": 18,
-  "Filing Cabinet": 15,
-  "Bookshelf (Small)": 20,
-  "Monitor": 5,
-  "Printer": 8,
-  // Garage / Storage
-  "Tool Chest": 20,
-  "Workbench": 25,
-  "Lawn Mower": 15,
-  "Bicycle": 12,
-  "Storage Bin (Large)": 8,
-  "Storage Bin (Medium)": 5,
+  desk: 20,
+  office_chair: 12,
+  filing_cabinet: 15,
+  // Garage
+  toolbox_large: 15,
+  bicycle: 12,
+  ladder: 8,
+  lawn_mower: 15,
   // Other
-  "Box (Large)": 4.5,
-  "Box (Medium)": 3,
-  "Box (Small)": 1.5,
-  "Lamp": 5,
-  "Mirror (Large)": 8,
-  "Plant (Large)": 10,
-  "Suitcase": 8,
+  box_large: 4,
+  box_medium: 3,
+  box_small: 2,
+  large_rug: 5,
 };
 
 export const ROOMS: Record<string, string[]> = {
   Bedroom: [
-    "Queen Bed", "King Bed", "Twin Bed", "Dresser", "Nightstand",
-    "Wardrobe", "Mattress (Queen)", "Mattress (King)", "Bed Frame", "Vanity"
+    "Queen Bed", "King Bed", "Twin Bed",
+    "Dresser", "Nightstand", "Wardrobe",
+    "Mattress (Queen)", "Mattress (King)", "Mattress (Twin)",
   ],
   "Living Room": [
-    "Sofa (3-Seat)", "Sofa (2-Seat)", "Sectional", "Coffee Table",
-    "TV Stand", "Bookshelf", "Recliner", "Armchair", "TV (55\"+)", "Rug (Large)"
+    "Sofa (3-seater)", "Sofa (2-seater)", "Loveseat",
+    "Coffee Table", "TV Stand", "Bookshelf",
+    "Armchair", "Large Rug",
   ],
   Kitchen: [
-    "Dining Table", "Dining Chair", "Refrigerator", "Microwave",
-    "Dishwasher", "Stove/Oven", "Kitchen Island", "Bar Stool"
+    "Dining Table", "Dining Chair", "Refrigerator",
+    "Microwave", "Dishwasher", "Stove/Oven",
   ],
   Office: [
-    "Desk", "Office Chair", "Filing Cabinet", "Bookshelf (Small)", "Monitor", "Printer"
+    "Desk", "Office Chair", "Filing Cabinet", "Bookshelf",
   ],
-  "Garage / Storage": [
-    "Tool Chest", "Workbench", "Lawn Mower", "Bicycle",
-    "Storage Bin (Large)", "Storage Bin (Medium)"
+  Garage: [
+    "Toolbox (Large)", "Bicycle", "Ladder", "Lawn Mower",
   ],
   Other: [
-    "Box (Large)", "Box (Medium)", "Box (Small)", "Lamp", "Mirror (Large)",
-    "Plant (Large)", "Suitcase"
+    "Large Box", "Medium Box", "Small Box",
   ],
 };
 
 export function getCuFt(itemName: string): number {
-  // Exact match
-  if (CUBIC_FOOTAGE[itemName]) return CUBIC_FOOTAGE[itemName];
+  const key = itemName
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, "_")
+    .trim();
 
-  // Fuzzy match
-  const lower = itemName.toLowerCase();
-  for (const [key, value] of Object.entries(CUBIC_FOOTAGE)) {
-    if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) {
-      return value;
-    }
+  if (CUBIC_FOOTAGE[key] !== undefined) return CUBIC_FOOTAGE[key];
+
+  for (const [k, v] of Object.entries(CUBIC_FOOTAGE)) {
+    if (key.includes(k) || k.includes(key)) return v;
   }
 
-  return 15; // default fallback
+  console.warn(`No cu ft data for item: ${itemName}, defaulting to 15`);
+  return 15;
 }
 
 export function getItemsForRoom(room: string): string[] {
@@ -107,8 +97,17 @@ export function getRoomForItem(itemName: string): string {
   return "Other";
 }
 
-export function calculateTotalCuFt(items: { item: string; quantity: number }[]): number {
+export function calculateTotalCuFt(
+  items: { item: string; quantity: number }[],
+): number {
   return items.reduce((total, { item, quantity }) => {
     return total + getCuFt(item) * quantity;
   }, 0);
+}
+
+export function calculateQuote(totalCuFt: number): number {
+  const baseRate = 6.5;
+  const minQuote = 500;
+  const quote = Math.round(baseRate * totalCuFt);
+  return Math.max(quote, minQuote);
 }

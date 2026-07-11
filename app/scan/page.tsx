@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createWebScanner, type ScannerSession } from "@movers/scanner-web";
+import { createWebScanner, type ScannerSession } from "@/lib/scanner-web";
 
 const BACKEND_LABELS: Record<string, string> = {
   mediapipe: "LIVE: mediapipe",

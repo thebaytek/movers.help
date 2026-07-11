@@ -6,6 +6,11 @@ export const TRUCK_26FT: TruckConfig = {
   width: 8,
   height: 9,
   maxCuFt: 1872,
+  cargoStartZ: 7,     // cab takes ~7ft, cargo starts behind it
+  cargoLength: 19,    // ~19ft of actual cargo space
+  modelPath: "/models/box-truck.obj",
+  modelMtlPath: "/models/box-truck.mtl",
+  modelScale: 3.0,
 };
 
 export const TRUCK_53FT: TruckConfig = {
@@ -14,16 +19,36 @@ export const TRUCK_53FT: TruckConfig = {
   width: 8.5,
   height: 9,
   maxCuFt: 4054,
+  modelPath: "/models/53ft-trailer.glb",
+  modelScale: 1.0,
 };
 
 export const ROOM_COLORS: Record<string, string> = {
-  Bedroom: "#6366F1",        // indigo
-  "Living Room": "#06B6D4",  // cyan
-  Kitchen: "#10B981",        // emerald
-  Office: "#F59E0B",         // amber
-  "Garage / Storage": "#F97316", // orange
-  Other: "#8B5CF6",          // violet
+  Bedroom: "#7c3aed",           // violet
+  "Living Room": "#76ff03",     // green
+  Kitchen: "#76ff03",           // brand lime
+  Office: "#f59e0b",            // amber
+  "Garage / Storage": "#f97316", // orange
+  Other: "#a78bfa",             // lavender
 };
+
+export function getItemCategory(label: string): string {
+  const lower = label.toLowerCase();
+  if (lower.includes("sofa") || lower.includes("sectional") || lower.includes("couch")) return "sofa";
+  if (lower.includes("bed") || lower.includes("mattress")) return "bed";
+  if (lower.includes("table")) return "table";
+  if (lower.includes("desk")) return "desk";
+  if (lower.includes("chair") || lower.includes("stool")) return "chair";
+  if (lower.includes("bookshelf") || lower.includes("bookcase")) return "bookshelf";
+  if (lower.includes("refrigerator") || lower.includes("fridge")) return "fridge";
+  if (lower.includes("dresser") || lower.includes("nightstand")) return "dresser";
+  if (lower.includes("tv stand")) return "tvStand";
+  if (lower.includes("tool chest")) return "dresser";
+  if (lower.includes("lamp")) return "lamp";
+  if (lower.includes("bicycle") || lower.includes("bike")) return "bicycle";
+  if (lower.includes("box") || lower.includes("bin") || lower.includes("suitcase")) return "box";
+  return "other";
+}
 
 export function computeBoxDimensions(cuFt: number, label: string): [number, number, number] {
   const lower = label.toLowerCase();
@@ -64,18 +89,19 @@ export function computeItemPositions(
   items: TruckLoadItem[],
   config: TruckConfig
 ): (TruckLoadItem & { position: [number, number, number] })[] {
-  // Sort largest first
   const sorted = [...items].sort((a, b) => b.cuFt - a.cuFt);
 
   const positioned: (TruckLoadItem & { position: [number, number, number] })[] = [];
-  let x = 0, y = 0, z = 0;
+  const startZ = config.cargoStartZ ?? 0;
+  const maxZ = startZ + (config.cargoLength ?? config.length);
+
+  let x = 0, y = 0, z = startZ;
   let rowHeight = 0;
   let rowDepth = 0;
 
   for (const item of sorted) {
     const [w, h, d] = item.dimensions;
 
-    // Check if it fits in current row
     if (x + w > config.width) {
       x = 0;
       z += rowDepth + 0.5;
@@ -83,18 +109,16 @@ export function computeItemPositions(
       rowHeight = 0;
     }
 
-    // Stack on top if small enough
     if (y + h > config.height) {
       y = 0;
       x += w;
     }
 
-    // Check if we're beyond truck length
-    if (z + d > config.length) break;
+    if (z + d > maxZ) break;
 
     positioned.push({
       ...item,
-      position: [x + w / 2 - config.width / 2, y + h / 2 - config.height / 2, z + d / 2],
+      position: [x + w / 2 - config.width / 2, y + h / 2, z + d / 2],
     });
 
     rowHeight = Math.max(rowHeight, h);
@@ -134,3 +158,28 @@ export function calculateFillPercentage(items: TruckLoadItem[], config: TruckCon
   const totalCuFt = items.reduce((sum, item) => sum + item.cuFt, 0);
   return Math.min(Math.round((totalCuFt / config.maxCuFt) * 100), 100);
 }
+
+// ---------------------------------------------------------------------------
+// COCO_TO_INVENTORY — mapping from COCO class labels to inventory item names
+// Used by scanner-web's label-map.ts for detection label normalization
+// ---------------------------------------------------------------------------
+
+export const COCO_TO_INVENTORY: Record<string, string> = {
+  couch: "Sofa (3-seater)",
+  chair: "Dining Chair",
+  "dining table": "Dining Table",
+  bed: "Queen Bed",
+  refrigerator: "Refrigerator",
+  tv: "TV Stand",
+  bookcase: "Bookshelf",
+  "potted plant": "Large Rug",
+  backpack: "Large Box",
+  handbag: "Small Box",
+  suitcase: "Large Box",
+  oven: "Stove/Oven",
+  microwave: "Microwave",
+  sink: "Dishwasher",
+  clock: "Nightstand",
+  vase: "Nightstand",
+  laptop: "Desk",
+};
