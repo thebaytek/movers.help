@@ -1,10 +1,5 @@
 import type { NormalizedBbox } from "../types";
-
-export interface Position3D {
-  x: number;
-  y: number;
-  z: number;
-}
+import type { Position3D } from "./duplicate-guard";
 
 /**
  * Estimate a virtual 3D position from a 2D normalized bbox.

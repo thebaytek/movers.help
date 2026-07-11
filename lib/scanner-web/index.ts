@@ -19,10 +19,9 @@ export { InventoryManager, mapRawDetections, buildRoomSummary } from "./inventor
 export { SpatialTracker } from "./spatial/spatial-tracker";
 export type { TrackedItem, TrackResult, TrackerConfig } from "./spatial/spatial-tracker";
 export { DuplicateGuard } from "./spatial/duplicate-guard";
-export type { DuplicateGuardConfig, DuplicateResult } from "./spatial/duplicate-guard";
+export type { DuplicateGuardConfig, DuplicateResult, Position3D } from "./spatial/duplicate-guard";
 export { RoomMapper } from "./spatial/room-mapper";
 export { estimatePosition3d } from "./spatial/position-estimator";
-export type { Position3D } from "./spatial/position-estimator";
 
 // Volume & depth (Phase 3)
 export { VolumeCalculator } from "./geometry/volume-calculator";
