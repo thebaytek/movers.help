@@ -1,4 +1,4 @@
-import { Logo, LogoIcon } from "@/components/brand/logo";
+import { Logo } from "@/components/brand/logo";
 import Link from "next/link";
 
 const footerLinks = {
@@ -29,10 +29,9 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-950">
+    <footer className="border-t border-[#76ff03]/10 bg-[#08080e]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
-          {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Logo />
             <p className="mt-4 text-sm text-surface-500 dark:text-surface-400 leading-relaxed">
@@ -40,10 +39,9 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Link groups */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-4">
+              <h4 className="text-sm font-semibold text-[#f0f0f5] mb-4">
                 {title}
               </h4>
               <ul className="space-y-3">
@@ -51,7 +49,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-200 transition-colors"
+                      className="text-sm text-[#7a7a8c] hover:text-[#76ff03] transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -62,11 +60,11 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 pt-8 border-t border-surface-200 dark:border-surface-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-surface-400 dark:text-surface-500">
+        <div className="mt-16 pt-8 border-t border-[#76ff03]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-[#7a7a8c]">
             &copy; {new Date().getFullYear()} Movers.help. Built with care.
           </p>
-          <p className="text-sm text-surface-400 dark:text-surface-500">
+          <p className="text-sm text-[#7a7a8c]">
             All prices are estimates. Final pricing confirmed after inventory verification.
           </p>
         </div>

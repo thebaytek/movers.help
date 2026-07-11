@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Truck, ArrowRight, RotateCw, Info, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,10 +11,9 @@ import {
   TRUCK_53FT,
   computeItemPositions,
   generateDemoInventory,
-  ROOM_COLORS,
   calculateFillPercentage,
 } from "@/lib/truckConfig";
-import type { TruckConfig, TruckLoadItem } from "@/types";
+import type { TruckConfig } from "@/types";
 import type { TruckCanvasHandle } from "@/components/truck/truck-canvas";
 
 const TruckCanvas = dynamic(
@@ -22,7 +21,7 @@ const TruckCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[500px] rounded-2xl bg-surface-100 dark:bg-surface-900 animate-pulse flex items-center justify-center">
+      <div className="w-full h-[500px] rounded-2xl bg-surface-900 animate-pulse flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-surface-400 animate-spin" />
       </div>
     ),
@@ -31,7 +30,7 @@ const TruckCanvas = dynamic(
 
 export function TruckViewer() {
   const [truckConfig, setTruckConfig] = useState<TruckConfig>(TRUCK_26FT);
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate] = useState(true);
   const canvasRef = useRef<TruckCanvasHandle>(null);
 
   const demoItems = useMemo(() => generateDemoInventory(), []);
@@ -72,9 +71,9 @@ export function TruckViewer() {
 
   return (
     <section id="truck-viewer" className="relative overflow-hidden py-20 sm:py-28">
-      <div className="absolute inset-0 bg-grid opacity-40 dark:opacity-30" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-accent-500/[0.03] dark:bg-accent-500/[0.04] blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-brand-500/[0.03] dark:bg-brand-500/[0.04] blur-3xl" />
+      <div className="absolute inset-0 opacity-30" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[#76ff03]/[0.03] blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-[#76ff03]/[0.03] blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -85,9 +84,9 @@ export function TruckViewer() {
           className="text-center"
         >
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            <span className="gradient-text">See Exactly How Your Stuff Fits</span>
+            <span className="text-[#76ff03]">See Exactly How Your Stuff Fits</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-surface-500 dark:text-surface-400 sm:text-lg text-balance">
+          <p className="mx-auto mt-4 max-w-2xl text-base text-surface-400 sm:text-lg text-balance">
             Our 3D truck simulator places every detected item into a real truck
             model so you know exactly what size truck you need — before you pay a dime.
           </p>
@@ -101,7 +100,7 @@ export function TruckViewer() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
-            <div className="relative rounded-2xl overflow-hidden border border-surface-200 dark:border-surface-800 shadow-xl shadow-surface-900/5 dark:shadow-black/20 bg-white dark:bg-surface-950">
+            <div className="relative rounded-2xl overflow-hidden border border-surface-800 shadow-xl shadow-black/20 bg-surface-950">
               <div className="h-[500px]">
                 <TruckCanvas
                   ref={canvasRef}
@@ -128,14 +127,14 @@ export function TruckViewer() {
             className="flex flex-col gap-5"
           >
             {/* Truck size toggle */}
-            <div className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-5 shadow-sm">
+            <div className="rounded-2xl border border-surface-800 bg-surface-900 p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
-                <Truck className="w-5 h-5 text-accent-500" />
-                <span className="text-sm font-semibold text-surface-700 dark:text-surface-200">
+                <Truck className="w-5 h-5 text-[#76ff03]" />
+                <span className="text-sm font-semibold text-surface-200">
                   Truck Size
                 </span>
               </div>
-              <div className="flex rounded-xl bg-surface-100 dark:bg-surface-800 p-1 gap-1">
+              <div className="flex rounded-xl bg-surface-800 p-1 gap-1">
                 {[TRUCK_26FT, TRUCK_53FT].map((cfg) => (
                   <button
                     key={cfg.name}
@@ -143,12 +142,12 @@ export function TruckViewer() {
                     className={cn(
                       "flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200",
                       truckConfig.name === cfg.name
-                        ? "bg-white dark:bg-surface-700 text-surface-900 dark:text-surface-100 shadow-sm"
-                        : "text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200"
+                        ? "bg-surface-700 text-surface-100 shadow-sm"
+                        : "text-surface-400 hover:text-surface-200"
                     )}
                   >
                     {cfg.name.split(" ")[0]}
-                    <span className="block text-[10px] font-normal text-surface-400 dark:text-surface-500">
+                    <span className="block text-[10px] font-normal text-surface-500">
                       {cfg.name.includes("26") ? "26 ft" : "53 ft"}
                     </span>
                   </button>
@@ -161,17 +160,17 @@ export function TruckViewer() {
               key={truckConfig.name}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-5 shadow-sm"
+              className="rounded-2xl border border-surface-800 bg-surface-900 p-5 shadow-sm"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
+                <span className="text-xs font-medium text-surface-400 uppercase tracking-wider">
                   Trailer Fill
                 </span>
-                <span className="text-sm font-bold tabular-nums text-surface-900 dark:text-surface-100">
+                <span className="text-sm font-bold tabular-nums text-surface-100">
                   {fillPercentage}%
                 </span>
               </div>
-              <div className="h-3 rounded-full bg-surface-100 dark:bg-surface-800 overflow-hidden">
+              <div className="h-3 rounded-full bg-surface-800 overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${fillPercentage}%` }}
@@ -179,10 +178,10 @@ export function TruckViewer() {
                   className={cn(
                     "h-full rounded-full transition-colors duration-500",
                     fillPercentage > 85
-                      ? "bg-gradient-to-r from-accent-500 to-red-500"
+                      ? "bg-gradient-to-r from-[#76ff03] to-red-500"
                       : fillPercentage > 60
-                        ? "bg-gradient-to-r from-accent-500 to-accent-600"
-                        : "bg-gradient-to-r from-brand-500 to-accent-500"
+                        ? "bg-gradient-to-r from-[#76ff03] to-[#5ecc02]"
+                        : "bg-gradient-to-r from-[#5ecc02] to-[#76ff03]"
                   )}
                 />
               </div>
@@ -194,29 +193,29 @@ export function TruckViewer() {
 
             {/* Stats grid */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-4 shadow-sm">
-                <div className="text-2xl font-bold text-surface-900 dark:text-surface-100 tabular-nums">
+              <div className="rounded-xl border border-surface-800 bg-surface-900 p-4 shadow-sm">
+                <div className="text-2xl font-bold text-surface-100 tabular-nums">
                   {positionedItems.length}
                 </div>
-                <div className="mt-0.5 text-xs text-surface-500 dark:text-surface-400">
+                <div className="mt-0.5 text-xs text-surface-400">
                   Items loaded
                 </div>
               </div>
-              <div className="rounded-xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-4 shadow-sm">
-                <div className="text-2xl font-bold text-surface-900 dark:text-surface-100 tabular-nums">
+              <div className="rounded-xl border border-surface-800 bg-surface-900 p-4 shadow-sm">
+                <div className="text-2xl font-bold text-surface-100 tabular-nums">
                   {totalCuFt.toLocaleString()}
                 </div>
-                <div className="mt-0.5 text-xs text-surface-500 dark:text-surface-400">
+                <div className="mt-0.5 text-xs text-surface-400">
                   Total cubic feet
                 </div>
               </div>
             </div>
 
             {/* Room legend */}
-            <div className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-5 shadow-sm">
+            <div className="rounded-2xl border border-surface-800 bg-surface-900 p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
                 <Info className="w-4 h-4 text-surface-400" />
-                <span className="text-sm font-semibold text-surface-700 dark:text-surface-200">
+                <span className="text-sm font-semibold text-surface-200">
                   Rooms
                 </span>
               </div>
@@ -224,10 +223,10 @@ export function TruckViewer() {
                 {roomSummary.map(({ room, count, cuFt, color }) => (
                   <div key={room} className="flex items-center gap-3">
                     <div
-                      className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-offset-1 ring-offset-white dark:ring-offset-surface-900"
+                      className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-offset-1 ring-offset-surface-950"
                       style={{ backgroundColor: color, "--tw-ring-color": color + "40" } as React.CSSProperties}
                     />
-                    <span className="flex-1 text-xs text-surface-600 dark:text-surface-300 truncate">
+                    <span className="flex-1 text-xs text-surface-300 truncate">
                       {room}
                     </span>
                     <span className="text-[10px] text-surface-400 tabular-nums">

@@ -45,10 +45,15 @@ export type LeadStatus = "new" | "contacted" | "quoted" | "booked" | "completed"
 
 export interface TruckConfig {
   name: string;
-  length: number;
+  length: number;       // total vehicle length in ft
   width: number;
   height: number;
   maxCuFt: number;
+  cargoStartZ?: number; // Z offset where cargo box begins (after cab), in ft. Default 0.
+  cargoLength?: number; // usable cargo box length in ft. Default = length.
+  modelPath?: string;    // OBJ/GLB model in /public
+  modelMtlPath?: string; // MTL material file (OBJ only)
+  modelScale?: number;   // override auto-calculated scale
 }
 
 export interface TruckLoadItem {
@@ -58,4 +63,5 @@ export interface TruckLoadItem {
   dimensions: [number, number, number];
   color: string;
   room: string;
+  category?: string;
 }

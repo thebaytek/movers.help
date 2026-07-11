@@ -2,7 +2,6 @@ export { SpatialTracker } from "./spatial-tracker";
 export type { TrackedItem, TrackResult, TrackerConfig } from "./spatial-tracker";
 export { DuplicateGuard } from "./duplicate-guard";
 export type {
-  Position3d,
   SeenEntry,
   DuplicateResult,
   DuplicateGuardConfig,

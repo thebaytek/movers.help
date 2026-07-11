@@ -1,52 +1,40 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme {
-  --color-brand-50: #f0f7ff;
-  --color-brand-100: #e0effe;
-  --color-brand-200: #bae0fd;
-  --color-brand-300: #7cc8fb;
-  --color-brand-400: #36aaf5;
-  --color-brand-500: #0c8ee6;
-  --color-brand-600: #0070c4;
-  --color-brand-700: #01599e;
-  --color-brand-800: #064c83;
-  --color-brand-900: #0b406d;
-  --color-brand-950: #072848;
+  /* Accent: Lime / Matrix Green */
+  --color-accent-50: #f2ffe6;
+  --color-accent-100: #dfffcc;
+  --color-accent-200: #ccffaa;
+  --color-accent-300: #aaff77;
+  --color-accent-400: #8fff44;
+  --color-accent-500: #76ff03;
+  --color-accent-600: #5ecc02;
+  --color-accent-700: #479901;
+  --color-accent-800: #2f6600;
+  --color-accent-900: #183300;
+  --color-accent-950: #0c1a00;
 
-  --color-accent-50: #ecfeff;
-  --color-accent-100: #cffafe;
-  --color-accent-200: #a5f3fc;
-  --color-accent-300: #67e8f9;
-  --color-accent-400: #22d3ee;
-  --color-accent-500: #06b6d4;
-  --color-accent-600: #0891b2;
-  --color-accent-700: #0e7490;
-  --color-accent-800: #155e75;
-  --color-accent-900: #164e63;
-  --color-accent-950: #083344;
+  /* Surface: Dark void */
+  --color-surface-50: #f0f0f5;
+  --color-surface-100: #e0e0e8;
+  --color-surface-200: #c0c0cc;
+  --color-surface-300: #9a9aa8;
+  --color-surface-400: #7a7a8c;
+  --color-surface-500: #5a5a6e;
+  --color-surface-600: #3e3e52;
+  --color-surface-700: #262638;
+  --color-surface-800: #141424;
+  --color-surface-900: #0c0c16;
+  --color-surface-950: #08080e;
 
-  --color-surface-50: #f8fafc;
-  --color-surface-100: #f1f5f9;
-  --color-surface-200: #e2e8f0;
-  --color-surface-300: #cbd5e1;
-  --color-surface-400: #94a3b8;
-  --color-surface-500: #64748b;
-  --color-surface-600: #475569;
-  --color-surface-700: #334155;
-  --color-surface-800: #1e293b;
-  --color-surface-900: #0f172a;
-  --color-surface-950: #020617;
-
-  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
 }
 
 @layer base {
   * {
-    @apply border-surface-200 dark:border-surface-800;
+    @apply border-[#161626];
   }
 
   html {
@@ -54,30 +42,29 @@
   }
 
   body {
-    @apply bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-surface-100;
+    @apply bg-surface-950 text-surface-100;
     font-family: var(--font-sans);
   }
 
   ::selection {
-    @apply bg-brand-500/20 text-brand-900 dark:text-brand-100;
+    background: rgba(118, 255, 3, 0.2);
+    color: #dfffcc;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 dark:bg-surface-900/70 backdrop-blur-xl border border-surface-200/50 dark:border-surface-700/50 shadow-lg shadow-surface-900/5 dark:shadow-black/20;
+    @apply bg-surface-900/70 backdrop-blur-xl border border-[#161626]/50 shadow-lg shadow-black/20;
+    border-color: rgba(118, 255, 3, 0.08);
   }
 
   .glass-elevated {
-    @apply bg-white/85 dark:bg-surface-800/85 backdrop-blur-2xl border border-surface-200/60 dark:border-surface-600/60 shadow-xl shadow-surface-900/10 dark:shadow-black/30;
+    @apply bg-surface-800/85 backdrop-blur-2xl border border-[#161626]/60 shadow-xl shadow-black/30;
+    border-color: rgba(118, 255, 3, 0.08);
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 dark:from-brand-400 dark:via-accent-400 dark:to-accent-300;
-  }
-
-  .gradient-text-reverse {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-500 via-brand-500 to-brand-700 dark:from-accent-400 dark:via-brand-400 dark:to-brand-300;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-600 to-accent-500;
   }
 
   .gradient-border {
@@ -86,7 +73,7 @@
 
   .gradient-border::before {
     content: "";
-    @apply absolute inset-0 rounded-[inherit] p-px bg-gradient-to-r from-brand-500 to-accent-500;
+    @apply absolute inset-0 rounded-[inherit] p-px bg-gradient-to-r from-accent-600 to-accent-500;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor;
@@ -94,22 +81,99 @@
 
   .bg-grid {
     background-size: 40px 40px;
-    background-image: linear-gradient(to right, rgb(148 163 184 / 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(148 163 184 / 0.05) 1px, transparent 1px);
-  }
-
-  .dark .bg-grid {
-    background-image: linear-gradient(to right, rgb(148 163 184 / 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(148 163 184 / 0.06) 1px, transparent 1px);
+    background-image:
+      linear-gradient(to right, rgba(118, 255, 3, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(118, 255, 3, 0.04) 1px, transparent 1px);
   }
 
   .bg-dots {
     background-size: 24px 24px;
-    background-image: radial-gradient(circle, rgb(148 163 184 / 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(118, 255, 3, 0.04) 1px, transparent 1px);
   }
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Matrix-themed utilities */
+  .matrix-scan-line {
+    @apply w-full h-px relative overflow-hidden;
+    background: linear-gradient(90deg, transparent, #76ff03, transparent);
+    box-shadow: 0 0 8px rgba(118, 255, 3, 0.6), 0 0 16px rgba(118, 255, 3, 0.3);
+  }
+
+  .green-glow {
+    box-shadow: 0 0 20px rgba(118, 255, 3, 0.15), 0 0 40px rgba(118, 255, 3, 0.08);
+  }
+
+  .green-glow-text {
+    text-shadow: 0 0 10px rgba(118, 255, 3, 0.6), 0 0 20px rgba(118, 255, 3, 0.3);
+  }
+
+  .terminal-panel {
+    @apply bg-surface-950 border border-accent-500/30 rounded-lg p-4;
+    font-family: var(--font-mono);
+  }
+
+  .green-border {
+    border-color: rgba(118, 255, 3, 0.2);
+  }
+
+  /* Matrix scan-line overlay — subtle CRT scan line effect across entire page */
+  .scan-line-overlay {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(118, 255, 3, 0.015) 2px,
+      rgba(118, 255, 3, 0.015) 4px
+    );
+  }
+
+  /* Matrix raindrop effect utility */
+  @keyframes matrix-fall {
+    0% { transform: translateY(-100%); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  .matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .matrix-rain-column {
+    position: absolute;
+    top: -20px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    color: rgba(118, 255, 3, 0.3);
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    animation: matrix-fall 8s linear infinite;
+  }
+
+  /* NVIDIA-inspired green border accent for interactive elements */
+  .nvidia-border {
+    border: 1px solid rgba(118, 255, 3, 0.2);
+    transition: border-color 0.2s ease;
+  }
+  .nvidia-border:hover {
+    border-color: rgba(118, 255, 3, 0.5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scan-line-overlay {
+      background: none;
+    }
   }
 }
 
@@ -119,8 +183,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(12, 142, 230, 0.15); }
-  50% { box-shadow: 0 0 40px rgba(12, 142, 230, 0.3); }
+  0%, 100% { box-shadow: 0 0 20px rgba(118, 255, 3, 0.12); }
+  50% { box-shadow: 0 0 40px rgba(118, 255, 3, 0.25); }
 }
 
 @keyframes shimmer {
@@ -145,7 +209,7 @@
 
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
-.animate-shimmer { background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+.animate-shimmer { background: linear-gradient(90deg, transparent 0%, rgba(118,255,3,0.08) 50%, transparent 100%); background-size: 200% 100%; animation: shimmer 2s infinite; }
 .animate-slide-up { animation: slide-up 0.5s ease-out forwards; }
 .animate-slide-down { animation: slide-down 0.3s ease-out forwards; }
 .animate-scale-in { animation: scale-in 0.2s ease-out forwards; }

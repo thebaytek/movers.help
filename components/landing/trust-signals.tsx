@@ -57,9 +57,9 @@ export function TrustSignals() {
   return (
     <section
       ref={ref}
-      className="relative py-24 sm:py-32 overflow-hidden"
+      className="relative py-24 sm:py-32 overflow-hidden bg-[#0c0c16]"
     >
-      <div className="absolute inset-0 bg-surface-100/50 dark:bg-surface-900/50" />
+      <div className="absolute inset-0 bg-surface-900/50" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
@@ -71,7 +71,7 @@ export function TrustSignals() {
           <h2 className="text-4xl font-bold tracking-tight font-display sm:text-5xl">
             <span className="gradient-text">Why People Trust Us</span>
           </h2>
-          <p className="mt-6 text-lg leading-relaxed text-surface-600 dark:text-surface-400 text-balance">
+          <p className="mt-6 text-lg leading-relaxed text-surface-400 text-balance">
             Every claim on this page is backed by our technology, our contracts,
             and our track record. No &quot;trusted by millions&quot; fluff.
           </p>
@@ -86,13 +86,13 @@ export function TrustSignals() {
           {benefits.map((benefit) => (
             <motion.div key={benefit.title} variants={fadeInUp}>
               <Card className="group h-full p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-950/50">
-                  <benefit.icon className="h-5 w-5 text-brand-600 dark:text-brand-400" />
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-950/50">
+                  <benefit.icon className="h-5 w-5 text-accent-500" />
                 </div>
-                <h3 className="text-base font-bold text-surface-900 dark:text-surface-100 font-display">
+                <h3 className="text-base font-bold text-surface-100 font-display">
                   {benefit.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-surface-500 dark:text-surface-400">
+                <p className="mt-2 text-sm leading-relaxed text-surface-400">
                   {benefit.description}
                 </p>
               </Card>

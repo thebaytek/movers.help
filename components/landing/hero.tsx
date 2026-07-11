@@ -72,7 +72,7 @@ function ScrollIndicator() {
           height="36"
           viewBox="0 0 24 36"
           fill="none"
-          className="text-surface-400 dark:text-surface-500"
+          className="text-surface-500"
         >
           <rect
             x="0.75"
@@ -156,8 +156,8 @@ const wordVariants = {
     filter: "blur(0px)",
     transition: {
       duration: 0.55,
-      delay: 0.7 + i * 0.07,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      delay: 0.7 + i * 0.06,
+      ease: [0.32, 0.72, 0, 1],
     },
   }),
 };
@@ -170,18 +170,18 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-surface-50 dark:bg-surface-950">
-      <div className="absolute inset-0 bg-grid" />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#08080e]">
+      <div className="absolute inset-0" />
 
       <FloatingOrb
         className="top-[-10%] right-[-15%]"
-        colorClass="bg-brand-500/20 dark:bg-brand-400/12"
+        colorClass="bg-accent-500/15"
         size={700}
         duration={9}
       />
       <FloatingOrb
         className="bottom-[-15%] left-[-12%]"
-        colorClass="bg-accent-500/20 dark:bg-accent-400/12"
+        colorClass="bg-accent-500/12"
         size={550}
         delay={1.5}
         duration={10}
@@ -190,7 +190,7 @@ export function Hero() {
       />
       <FloatingOrb
         className="top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2"
-        colorClass="bg-brand-400/8 dark:bg-brand-400/5"
+        colorClass="bg-accent-500/6"
         size={400}
         delay={3}
         duration={11}
@@ -200,10 +200,22 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, filter: "blur(12px)" }}
           animate={{ opacity: 1, filter: "blur(0px)" }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="flex justify-center mb-12"
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.32, 0.72, 0, 1] }}
+          className="flex justify-center mb-10"
         >
           <Logo />
+        </motion.div>
+
+        {/* Eyebrow badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4, ease: [0.32, 0.72, 0, 1] }}
+          className="flex justify-center mb-6"
+        >
+          <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-accent-500 bg-accent-500/[0.06] border border-accent-500/[0.12]">
+            AI-Powered Long Distance Moving
+          </span>
         </motion.div>
 
         <h1 className="mx-auto max-w-5xl text-center font-display text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl gradient-text text-balance leading-[1.1]">
@@ -217,31 +229,31 @@ export function Hero() {
               custom={i}
             >
               {word}
-              {i < headline.split(" ").length - 1 ? "\u00A0" : ""}
+              {i < headline.split(" ").length - 1 ? " " : ""}
             </motion.span>
           ))}
         </h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{
-            duration: 0.6,
+            duration: 0.7,
             delay: 1.5,
-            ease: [0.25, 0.46, 0.45, 0.94],
+            ease: [0.32, 0.72, 0, 1],
           }}
-          className="mx-auto mt-8 max-w-3xl text-center text-base sm:text-lg md:text-xl text-surface-500 dark:text-surface-400 text-balance leading-relaxed"
+          className="mx-auto mt-8 max-w-3xl text-center text-base sm:text-lg md:text-xl text-surface-400 text-balance leading-relaxed"
         >
           {subheadline}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{
-            duration: 0.5,
+            duration: 0.7,
             delay: 1.75,
-            ease: [0.25, 0.46, 0.45, 0.94],
+            ease: [0.32, 0.72, 0, 1],
           }}
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
@@ -256,14 +268,14 @@ export function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{
-            duration: 0.5,
+            duration: 0.7,
             delay: 2.0,
-            ease: [0.25, 0.46, 0.45, 0.94],
+            ease: [0.32, 0.72, 0, 1],
           }}
-          className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-surface-400 dark:text-surface-500"
+          className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-surface-400"
         >
           {trustItems.map((item, i) => (
             <div key={item.label} className="flex items-center gap-1.5">
@@ -276,7 +288,7 @@ export function Hero() {
                 ))}
               <span>{item.label}</span>
               {i < trustItems.length - 1 && (
-                <span className="hidden sm:inline text-surface-200 dark:text-surface-700 mx-2">
+                <span className="hidden sm:inline text-surface-700 mx-2">
                   |
                 </span>
               )}

@@ -28,7 +28,7 @@ export const ROOM_COLORS: Record<string, string> = {
   "Living Room": "#76ff03",     // green
   Kitchen: "#76ff03",           // brand lime
   Office: "#f59e0b",            // amber
-  "Garage / Storage": "#f97316", // orange
+  Garage: "#f97316", // orange
   Other: "#a78bfa",             // lavender
 };
 
@@ -149,8 +149,8 @@ export function generateDemoInventory(): TruckLoadItem[] {
     { id: "demo-16", label: "Box (Small)", cuFt: 1.5, dimensions: [1, 1, 1], color: ROOM_COLORS["Other"], room: "Other" },
     { id: "demo-17", label: "Lamp", cuFt: 5, dimensions: [1, 2.5, 1], color: ROOM_COLORS["Other"], room: "Other" },
     { id: "demo-18", label: "Suitcase", cuFt: 8, dimensions: [2, 1.5, 1.5], color: ROOM_COLORS["Other"], room: "Other" },
-    { id: "demo-19", label: "Tool Chest", cuFt: 20, dimensions: [2.5, 3, 1.5], color: ROOM_COLORS["Garage / Storage"], room: "Garage / Storage" },
-    { id: "demo-20", label: "Bicycle", cuFt: 12, dimensions: [5, 3.5, 1], color: ROOM_COLORS["Garage / Storage"], room: "Garage / Storage" },
+    { id: "demo-19", label: "Tool Chest", cuFt: 20, dimensions: [2.5, 3, 1.5], color: ROOM_COLORS["Garage"], room: "Garage" },
+    { id: "demo-20", label: "Bicycle", cuFt: 12, dimensions: [5, 3.5, 1], color: ROOM_COLORS["Garage"], room: "Garage" },
   ];
 }
 
@@ -165,6 +165,7 @@ export function calculateFillPercentage(items: TruckLoadItem[], config: TruckCon
 // ---------------------------------------------------------------------------
 
 export const COCO_TO_INVENTORY: Record<string, string> = {
+  // Furniture
   couch: "Sofa (3-seater)",
   chair: "Dining Chair",
   "dining table": "Dining Table",
@@ -172,14 +173,28 @@ export const COCO_TO_INVENTORY: Record<string, string> = {
   refrigerator: "Refrigerator",
   tv: "TV Stand",
   bookcase: "Bookshelf",
-  "potted plant": "Large Rug",
-  backpack: "Large Box",
-  handbag: "Small Box",
-  suitcase: "Large Box",
   oven: "Stove/Oven",
   microwave: "Microwave",
   sink: "Dishwasher",
-  clock: "Nightstand",
+  // Decor / small items
+  "potted plant": "Plant (Large)",
   vase: "Nightstand",
+  clock: "Nightstand",
+  // Bags / boxes (COCO sees these as furniture when carried)
+  backpack: "Large Box",
+  handbag: "Small Box",
+  suitcase: "Suitcase",
+  // Office
   laptop: "Desk",
+  keyboard: "Monitor",
+  // Outdoor / garage
+  bicycle: "Bicycle",
+  bench: "Bench",
+  // Misc → best-guess mappings
+  umbrella: "Floor Lamp",
+  bottle: "Small Box",
+  "wine glass": "Wine Rack",
+  cup: "Small Box",
+  bowl: "Small Box",
+  toaster: "Toaster Oven",
 };

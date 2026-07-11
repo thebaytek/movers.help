@@ -1,4 +1,4 @@
-export interface Position3d {
+export interface Position3D {
   x: number;
   y: number;
   z: number;
@@ -7,7 +7,7 @@ export interface Position3d {
 export interface SeenEntry {
   trackingId: number;
   className: string;
-  position3d: Position3d;
+  position3d: Position3D;
   timestamp: number;
 }
 
@@ -34,7 +34,7 @@ export class DuplicateGuard {
   checkDuplicate(
     trackingId: number,
     className: string,
-    position3d?: Position3d,
+    position3d?: Position3D,
   ): DuplicateResult {
     if (!position3d) {
       return { isDuplicate: false };
@@ -59,7 +59,7 @@ export class DuplicateGuard {
     return { isDuplicate: false };
   }
 
-  markSeen(trackingId: number, className: string, position3d: Position3d): void {
+  markSeen(trackingId: number, className: string, position3d: Position3D): void {
     this.seenItems.set(trackingId, {
       trackingId,
       className,

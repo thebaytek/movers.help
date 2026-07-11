@@ -71,15 +71,8 @@ export class VolumeCalculator {
     }
 
     // 2. Fall back to local getCuFt() lookup table
-    try {
-      const cuFt = getCuFt(inventoryLabel);
-      return { cuFt, method: "lookup", confidence: 0.75 };
-    } catch {
-      return {
-        cuFt: this.config.fallbackCuFt,
-        method: "lookup",
-        confidence: 0.3,
-      };
-    }
+    // getCuFt() always returns a number (defaults to 15 for unknown items)
+    const cuFt = getCuFt(inventoryLabel);
+    return { cuFt, method: "lookup", confidence: 0.75 };
   }
 }

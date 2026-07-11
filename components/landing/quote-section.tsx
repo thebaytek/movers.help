@@ -7,17 +7,14 @@ import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { calculateQuote } from "@/lib/pricing";
 import { ROOMS, getItemsForRoom, getCuFt, calculateTotalCuFt } from "@/lib/inventory";
 import {
   MapPin,
-  Calendar,
   Package,
-  Phone,
-  Mail,
   ChevronLeft,
   ChevronRight,
   Plus,
@@ -97,9 +94,9 @@ function StepIndicator({ current }: { current: number }) {
               <div
                 className={cn(
                   "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300",
-                  isDone && "bg-brand-600 text-white",
-                  isActive && "bg-brand-600 text-white ring-4 ring-brand-500/20",
-                  !isDone && !isActive && "bg-surface-100 dark:bg-surface-800 text-surface-400"
+                  isDone && "bg-[#76ff03] text-[#08080e]",
+                  isActive && "bg-[#76ff03] text-[#08080e] ring-4 ring-[#76ff03]/20",
+                  !isDone && !isActive && "bg-surface-800 text-surface-400"
                 )}
               >
                 {isDone ? <Check className="w-4 h-4" /> : stepNum}
@@ -107,7 +104,7 @@ function StepIndicator({ current }: { current: number }) {
               <span
                 className={cn(
                   "text-xs mt-2 font-medium hidden sm:block",
-                  isActive ? "text-brand-600 dark:text-brand-400" : "text-surface-400"
+                  isActive ? "text-[#76ff03]" : "text-surface-400"
                 )}
               >
                 {label}
@@ -117,7 +114,7 @@ function StepIndicator({ current }: { current: number }) {
               <div
                 className={cn(
                   "w-8 sm:w-16 h-0.5 mx-1 sm:mx-2 transition-colors duration-300",
-                  stepNum < current ? "bg-brand-600" : "bg-surface-200 dark:bg-surface-700"
+                  stepNum < current ? "bg-[#76ff03]" : "bg-surface-700"
                 )}
               />
             )}
@@ -160,7 +157,6 @@ export function QuoteSection() {
 
   const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = form;
   const needsStorage = watch("needsStorage");
-  const needsPacking = watch("needsPacking");
 
   function goToStep(step: number) {
     setDirection(step > currentStep ? 1 : -1);
@@ -297,27 +293,27 @@ export function QuoteSection() {
 
   if (submitted) {
     return (
-      <section id="quote" className="py-24 px-4">
+      <section id="quote" className="py-24 px-4 bg-[#0c0c16]">
         <div className="max-w-2xl mx-auto text-center">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="w-20 h-20 mx-auto mb-6 rounded-full bg-brand-100 dark:bg-brand-900/50 flex items-center justify-center"
+            className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#76ff03]/10 flex items-center justify-center"
           >
             <motion.div
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <Check className="w-10 h-10 text-brand-600 dark:text-brand-400" />
+              <Check className="w-10 h-10 text-[#76ff03]" />
             </motion.div>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-3xl font-display font-bold gradient-text mb-4"
+            className="text-3xl font-display font-bold text-[#76ff03] mb-4"
           >
             Quote submitted!
           </motion.h2>
@@ -325,7 +321,7 @@ export function QuoteSection() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-surface-600 dark:text-surface-400 text-lg"
+            className="text-surface-400 text-lg"
           >
             We&apos;ll connect you with verified movers within 24 hours.
           </motion.p>
@@ -334,7 +330,7 @@ export function QuoteSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="mt-4 text-2xl font-bold text-surface-900 dark:text-surface-100"
+              className="mt-4 text-2xl font-bold text-surface-100"
             >
               Estimated: {formatCurrency(quoteResult.estimatedTotal)}
             </motion.p>
@@ -345,13 +341,13 @@ export function QuoteSection() {
   }
 
   return (
-    <section id="quote" className="py-24 px-4">
+    <section id="quote" className="py-24 px-4 bg-[#0c0c16]">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl font-display font-bold gradient-text mb-4">
+          <h2 className="text-4xl sm:text-5xl font-display font-bold text-[#76ff03] mb-4">
             Get Your Quote
           </h2>
-          <p className="text-surface-600 dark:text-surface-400 text-lg max-w-xl mx-auto text-balance">
+          <p className="text-surface-400 text-lg max-w-xl mx-auto text-balance">
             Tell us about your move and inventory for an instant, all-in price estimate
           </p>
         </div>
@@ -373,11 +369,11 @@ export function QuoteSection() {
                 {currentStep === 1 && (
                   <div className="space-y-5">
                     <div>
-                      <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100 flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-brand-500" />
+                      <h3 className="text-xl font-bold text-surface-100 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-[#76ff03]" />
                         Where are you moving?
                       </h3>
-                      <p className="text-sm text-surface-500 mt-1">Enter your origin and destination</p>
+                      <p className="text-sm text-surface-400 mt-1">Enter your origin and destination</p>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
@@ -386,7 +382,7 @@ export function QuoteSection() {
                           key={route.label}
                           type="button"
                           onClick={() => quickFill(route.fromCity, route.fromState, route.toCity, route.toState)}
-                          className="px-3 py-1.5 text-xs font-medium rounded-full border border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 hover:border-brand-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+                          className="px-3 py-1.5 text-xs font-medium rounded-full border border-surface-700 text-surface-400 hover:border-[#76ff03] hover:text-[#76ff03] transition-colors"
                         >
                           {route.label}
                         </button>
@@ -395,7 +391,7 @@ export function QuoteSection() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                        <label className="block text-sm font-medium text-surface-300 mb-1.5">
                           From City
                         </label>
                         <Input {...register("fromCity")} placeholder="New York" />
@@ -404,12 +400,12 @@ export function QuoteSection() {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                        <label className="block text-sm font-medium text-surface-300 mb-1.5">
                           From State
                         </label>
                         <select
                           {...register("fromState")}
-                          className="flex h-11 w-full rounded-xl border-2 border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 px-4 py-2 text-sm text-surface-900 dark:text-surface-100 focus-visible:outline-none focus-visible:border-brand-500 focus-visible:ring-4 focus-visible:ring-brand-500/10 transition-all duration-200"
+                          className="flex h-11 w-full rounded-xl border-2 border-surface-800 bg-surface-900 px-4 py-2 text-sm text-surface-100 focus-visible:outline-none focus-visible:border-[#76ff03] focus-visible:ring-4 focus-visible:ring-[#76ff03]/10 transition-all duration-200"
                         >
                           <option value="">Select state</option>
                           {US_STATES.map((s) => (
@@ -424,7 +420,7 @@ export function QuoteSection() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                        <label className="block text-sm font-medium text-surface-300 mb-1.5">
                           To City
                         </label>
                         <Input {...register("toCity")} placeholder="Los Angeles" />
@@ -433,12 +429,12 @@ export function QuoteSection() {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                        <label className="block text-sm font-medium text-surface-300 mb-1.5">
                           To State
                         </label>
                         <select
                           {...register("toState")}
-                          className="flex h-11 w-full rounded-xl border-2 border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 px-4 py-2 text-sm text-surface-900 dark:text-surface-100 focus-visible:outline-none focus-visible:border-brand-500 focus-visible:ring-4 focus-visible:ring-brand-500/10 transition-all duration-200"
+                          className="flex h-11 w-full rounded-xl border-2 border-surface-800 bg-surface-900 px-4 py-2 text-sm text-surface-100 focus-visible:outline-none focus-visible:border-[#76ff03] focus-visible:ring-4 focus-visible:ring-[#76ff03]/10 transition-all duration-200"
                         >
                           <option value="">Select state</option>
                           {US_STATES.map((s) => (
@@ -452,7 +448,7 @@ export function QuoteSection() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                      <label className="block text-sm font-medium text-surface-300 mb-1.5">
                         Move Date
                       </label>
                       <Input
@@ -476,11 +472,11 @@ export function QuoteSection() {
                 {currentStep === 2 && (
                   <div className="space-y-5">
                     <div>
-                      <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100 flex items-center gap-2">
-                        <Package className="w-5 h-5 text-brand-500" />
+                      <h3 className="text-xl font-bold text-surface-100 flex items-center gap-2">
+                        <Package className="w-5 h-5 text-[#76ff03]" />
                         What are you moving?
                       </h3>
-                      <p className="text-sm text-surface-500 mt-1">
+                      <p className="text-sm text-surface-400 mt-1">
                         Add items from each room to build your inventory
                       </p>
                     </div>
@@ -494,8 +490,8 @@ export function QuoteSection() {
                           className={cn(
                             "px-3 py-1.5 text-sm font-medium rounded-full transition-colors",
                             activeRoom === room
-                              ? "bg-brand-600 text-white"
-                              : "bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400 hover:bg-surface-200 dark:hover:bg-surface-700"
+                              ? "bg-[#76ff03] text-[#08080e]"
+                              : "bg-surface-800 text-surface-400 hover:bg-surface-700"
                           )}
                         >
                           {room}
@@ -513,22 +509,22 @@ export function QuoteSection() {
                             className={cn(
                               "flex items-center justify-between p-3 rounded-xl border transition-all",
                               qty > 0
-                                ? "border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950/20"
-                                : "border-surface-200 dark:border-surface-800"
+                                ? "border-[#76ff03]/30 bg-[#76ff03]/5"
+                                : "border-surface-800"
                             )}
                           >
                             <div>
-                              <p className="text-sm font-medium text-surface-900 dark:text-surface-100">
+                              <p className="text-sm font-medium text-surface-100">
                                 {itemName}
                               </p>
-                              <p className="text-xs text-surface-500">{cuFt} cu ft each</p>
+                              <p className="text-xs text-surface-400">{cuFt} cu ft each</p>
                             </div>
                             <div className="flex items-center gap-3">
                               <button
                                 type="button"
                                 disabled={qty === 0}
                                 onClick={() => removeInventoryItem(itemName)}
-                                className="w-8 h-8 rounded-lg border border-surface-200 dark:border-surface-700 flex items-center justify-center text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800 disabled:opacity-30 transition-colors"
+                                className="w-8 h-8 rounded-lg border border-surface-700 flex items-center justify-center text-surface-400 hover:bg-surface-800 disabled:opacity-30 transition-colors"
                               >
                                 <Minus className="w-3.5 h-3.5" />
                               </button>
@@ -538,7 +534,7 @@ export function QuoteSection() {
                               <button
                                 type="button"
                                 onClick={() => addInventoryItem(itemName)}
-                                className="w-8 h-8 rounded-lg bg-brand-100 dark:bg-brand-900/50 flex items-center justify-center text-brand-600 dark:text-brand-400 hover:bg-brand-200 dark:hover:bg-brand-900 transition-colors"
+                                className="w-8 h-8 rounded-lg bg-[#76ff03]/10 flex items-center justify-center text-[#76ff03] hover:bg-[#76ff03]/20 transition-colors"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                               </button>
@@ -566,7 +562,7 @@ export function QuoteSection() {
                         <select
                           value={customItemRoom}
                           onChange={(e) => setCustomItemRoom(e.target.value)}
-                          className="h-11 rounded-xl border-2 border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 px-3 text-sm text-surface-900 dark:text-surface-100 focus-visible:outline-none focus-visible:border-brand-500 transition-all"
+                          className="h-11 rounded-xl border-2 border-surface-800 bg-surface-900 px-3 text-sm text-surface-100 focus-visible:outline-none focus-visible:border-[#76ff03] transition-all"
                         >
                           {ROOM_KEYS.map((r) => (
                             <option key={r} value={r}>{r}</option>
@@ -587,13 +583,13 @@ export function QuoteSection() {
                       <button
                         type="button"
                         onClick={() => setShowCustomItem(true)}
-                        className="w-full py-3 rounded-xl border-2 border-dashed border-surface-200 dark:border-surface-700 text-sm text-surface-500 hover:border-brand-300 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+                        className="w-full py-3 rounded-xl border-2 border-dashed border-surface-700 text-sm text-surface-400 hover:border-[#76ff03] hover:text-[#76ff03] transition-colors"
                       >
                         + Add Custom Item
                       </button>
                     )}
 
-                    <div className="flex items-center justify-between pt-3 border-t border-surface-100 dark:border-surface-800">
+                    <div className="flex items-center justify-between pt-3 border-t border-surface-800">
                       <div className="flex items-center gap-2">
                         <Badge variant="default">{totalItems} items</Badge>
                         <Badge variant="secondary">{totalCuFt.toLocaleString()} cu ft</Badge>
@@ -608,11 +604,11 @@ export function QuoteSection() {
                 {currentStep === 3 && (
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-brand-500" />
+                      <h3 className="text-xl font-bold text-surface-100 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-[#76ff03]" />
                         Options & Contact
                       </h3>
-                      <p className="text-sm text-surface-500 mt-1">
+                      <p className="text-sm text-surface-400 mt-1">
                         Choose extras and tell us how to reach you
                       </p>
                     </div>
@@ -622,13 +618,13 @@ export function QuoteSection() {
                         <input
                           type="checkbox"
                           {...register("needsPacking")}
-                          className="mt-0.5 w-4 h-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500"
+                          className="mt-0.5 w-4 h-4 rounded border-surface-700 text-[#76ff03] focus:ring-[#76ff03]"
                         />
                         <div>
-                          <p className="text-sm font-medium text-surface-900 dark:text-surface-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                          <p className="text-sm font-medium text-surface-100 group-hover:text-[#76ff03] transition-colors">
                             Need packing service?
                           </p>
-                          <p className="text-xs text-surface-500">+$1.25/cu ft — we pack everything for you</p>
+                          <p className="text-xs text-surface-400">+$1.25/cu ft — we pack everything for you</p>
                         </div>
                       </label>
 
@@ -636,13 +632,13 @@ export function QuoteSection() {
                         <input
                           type="checkbox"
                           {...register("needsStorage")}
-                          className="mt-0.5 w-4 h-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500"
+                          className="mt-0.5 w-4 h-4 rounded border-surface-700 text-[#76ff03] focus:ring-[#76ff03]"
                         />
                         <div>
-                          <p className="text-sm font-medium text-surface-900 dark:text-surface-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                          <p className="text-sm font-medium text-surface-100 group-hover:text-[#76ff03] transition-colors">
                             Need storage?
                           </p>
-                          <p className="text-xs text-surface-500">$25/day — secure warehouse storage</p>
+                          <p className="text-xs text-surface-400">$25/day — secure warehouse storage</p>
                         </div>
                       </label>
 
@@ -652,7 +648,7 @@ export function QuoteSection() {
                           animate={{ opacity: 1, height: "auto" }}
                           className="ml-7"
                         >
-                          <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                          <label className="block text-sm font-medium text-surface-300 mb-1.5">
                             How many days?
                           </label>
                           <Input
@@ -666,7 +662,7 @@ export function QuoteSection() {
                     </div>
 
                     <div>
-                      <p className="text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
+                      <p className="text-sm font-medium text-surface-300 mb-3">
                         Accessibility
                       </p>
                       <div className="flex flex-wrap gap-3">
@@ -680,8 +676,8 @@ export function QuoteSection() {
                             className={cn(
                               "px-4 py-2 rounded-xl border-2 text-sm font-medium cursor-pointer transition-all",
                               watch("accessibility") === opt.value
-                                ? "border-brand-500 bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-300"
-                                : "border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 hover:border-surface-300"
+                                ? "border-[#76ff03] bg-[#76ff03]/5 text-[#76ff03]"
+                                : "border-surface-700 text-surface-400 hover:border-surface-600"
                             )}
                           >
                             <input
@@ -698,7 +694,7 @@ export function QuoteSection() {
 
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                        <label className="block text-sm font-medium text-surface-300 mb-1.5">
                           Full Name
                         </label>
                         <Input {...register("name")} placeholder="John Doe" />
@@ -707,7 +703,7 @@ export function QuoteSection() {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                        <label className="block text-sm font-medium text-surface-300 mb-1.5">
                           Email
                         </label>
                         <Input {...register("email")} type="email" placeholder="john@example.com" />
@@ -716,7 +712,7 @@ export function QuoteSection() {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+                        <label className="block text-sm font-medium text-surface-300 mb-1.5">
                           Phone
                         </label>
                         <Input {...register("phone")} type="tel" placeholder="(555) 123-4567" />
@@ -737,33 +733,33 @@ export function QuoteSection() {
                 {currentStep === 4 && quoteResult && (
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100 flex items-center gap-2">
-                        <Check className="w-5 h-5 text-brand-500" />
+                      <h3 className="text-xl font-bold text-surface-100 flex items-center gap-2">
+                        <Check className="w-5 h-5 text-[#76ff03]" />
                         Review Your Quote
                       </h3>
-                      <p className="text-sm text-surface-500 mt-1">Here&apos;s your estimated all-in price</p>
+                      <p className="text-sm text-surface-400 mt-1">Here&apos;s your estimated all-in price</p>
                     </div>
 
-                    <div className="space-y-3 p-4 rounded-xl bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-800">
+                    <div className="space-y-3 p-4 rounded-xl bg-surface-900 border border-surface-800">
                       <div className="flex justify-between text-sm">
-                        <span className="text-surface-500">Move</span>
-                        <span className="font-medium text-surface-900 dark:text-surface-100">
+                        <span className="text-surface-400">Move</span>
+                        <span className="font-medium text-surface-100">
                           {form.getValues("fromCity")}, {form.getValues("fromState")} →{" "}
                           {form.getValues("toCity")}, {form.getValues("toState")}
-                          <span className="text-surface-400 ml-1">
+                          <span className="text-surface-500 ml-1">
                             ({quoteResult.distanceMiles.toLocaleString()} mi)
                           </span>
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-surface-500">Date</span>
-                        <span className="font-medium text-surface-900 dark:text-surface-100">
+                        <span className="text-surface-400">Date</span>
+                        <span className="font-medium text-surface-100">
                           {formatDate(form.getValues("moveDate"))}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-surface-500">Volume</span>
-                        <span className="font-medium text-surface-900 dark:text-surface-100">
+                        <span className="text-surface-400">Volume</span>
+                        <span className="font-medium text-surface-100">
                           {totalItems} items, {totalCuFt.toLocaleString()} cu ft
                         </span>
                       </div>
@@ -772,26 +768,26 @@ export function QuoteSection() {
                     <div className="space-y-2">
                       {quoteResult.breakdown.map((line) => (
                         <div key={line.label} className="flex justify-between text-sm">
-                          <span className="text-surface-500">
+                          <span className="text-surface-400">
                             {line.label}
                             {line.description && (
-                              <span className="text-surface-400 ml-1 text-xs">({line.description})</span>
+                              <span className="text-surface-500 ml-1 text-xs">({line.description})</span>
                             )}
                           </span>
-                          <span className="font-medium text-surface-900 dark:text-surface-100">
+                          <span className="font-medium text-surface-100">
                             {formatCurrency(line.amount)}
                           </span>
                         </div>
                       ))}
-                      <div className="flex justify-between pt-3 mt-3 border-t-2 border-surface-200 dark:border-surface-700">
-                        <span className="text-lg font-bold text-surface-900 dark:text-surface-100">Total</span>
-                        <span className="text-2xl font-bold gradient-text">
+                      <div className="flex justify-between pt-3 mt-3 border-t-2 border-surface-700">
+                        <span className="text-lg font-bold text-surface-100">Total</span>
+                        <span className="text-2xl font-bold text-[#76ff03]">
                           {formatCurrency(quoteResult.estimatedTotal)}
                         </span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-surface-400 text-center">
+                    <p className="text-xs text-surface-500 text-center">
                       This is an estimate. Final price may vary by up to 5% based on actual inventory verification.
                     </p>
 
@@ -800,9 +796,9 @@ export function QuoteSection() {
                         <input
                           type="checkbox"
                           required
-                          className="mt-0.5 w-4 h-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500"
+                          className="mt-0.5 w-4 h-4 rounded border-surface-700 text-[#76ff03] focus:ring-[#76ff03]"
                         />
-                        <span className="text-sm text-surface-600 dark:text-surface-400">
+                        <span className="text-sm text-surface-400">
                           I understand this is an estimate and agree to be contacted about my move
                         </span>
                       </label>

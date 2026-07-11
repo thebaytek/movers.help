@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>movers.help — Brand Identity System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:        #08080e;
+    --panel:     #0c0c16;
+    --border:    #161626;
+    --cyan:      #00e5ff;
+    --lime:      #76ff03;
+    --gray-mid:  #7a7a8c;
+    --gray-dark: #1a1a28;
+    --white:     #f0f0f5;
+    --red:       #ff3d4f;
+    --amber:     #ffab00;
+    --gutter:    10px;
+  }
+
+  html, body {
+    height: 100%;
+    background: #050510;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .deck {
+    width: 1400px;
+    height: 900px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: var(--gutter);
+    padding: var(--gutter);
+    background: var(--bg);
+    position: relative;
+  }
+
+  .deck::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .panel-label {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+  }
+  .panel-num {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    font-size: 8px;
+    color: #1a1a30;
+    letter-spacing: 1px;
+  }
+  .panel .accent-line {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,229,255,0.2), transparent);
+  }
+
+  .p-logo {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    gap: 24px;
+  }
+  .logo-svg-wrap {
+    width: 200px;
+    height: 200px;
+    position: relative;
+  }
+  .logo-svg-wrap svg { width: 100%; height: 100%; }
+
+  .wordmark {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    letter-spacing: -0.5px;
+    color: var(--white);
+  }
+  .wordmark .dot { color: var(--cyan); }
+  .wordmark .kilo { color: var(--lime); }
+
+  .tagline-sub {
+    font-size: 10px;
+    color: var(--gray-mid);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+  }
+
+  .p-construction {
+    flex-direction: row;
+    gap: 28px;
+    padding: 28px;
+    align-items: center;
+  }
+  .construction-svg {
+    width: 220px;
+    height: 220px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .construction-svg svg { width: 100%; height: 100%; }
+  .construction-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 10.5px;
+    color: var(--gray-mid);
+    line-height: 1.4;
+  }
+  .note .num {
+    color: var(--cyan);
+    font-weight: 700;
+    font-size: 11px;
+    min-width: 18px;
+  }
+  .note strong { color: var(--white); display: block; }
+
+  .p-icons {
+    padding: 24px;
+    gap: 18px;
+  }
+  .icon-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .icon-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .icon-card {
+    width: 60px; height: 60px;
+    background: #0a0a14;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+  }
+  .icon-card.round { border-radius: 50%; }
+  .icon-card-label {
+    font-size: 7.5px;
+    color: var(--gray-mid);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .p-terminal {
+    grid-column: 2 / 4;
+    grid-row: 3;
+    padding: 20px;
+    justify-content: flex-start;
+    gap: 0;
+  }
+  .term {
+    width: 100%;
+    background: #04040a;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .term-bar {
+    height: 30px;
+    background: #0e0e18;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 7px;
+    border-bottom: 1px solid var(--border);
+  }
+  .term-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .term-dot.r { background: var(--red); }
+  .term-dot.y { background: var(--amber); }
+  .term-dot.g { background: var(--lime); }
+  .term-title {
+    margin-left: 6px;
+    font-size: 10px;
+    color: var(--gray-mid);
+  }
+  .term-body {
+    padding: 16px 18px;
+    font-size: 12px;
+    line-height: 2;
+  }
+  .tc { color: var(--cyan); }
+  .tl { color: var(--lime); }
+  .td { color: var(--gray-mid); }
+  .tw { color: var(--white); }
+  .tcursor {
+    display: inline-block;
+    width: 7px; height: 13px;
+    background: var(--cyan);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .chip-row {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .chip {
+    font-size: 9px;
+    padding: 5px 12px;
+    border: 1px solid rgba(0,229,255,0.25);
+    border-radius: 3px;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: rgba(0,229,255,0.04);
+  }
+  .chip.lime {
+    border-color: rgba(118,255,3,0.25);
+    color: var(--lime);
+    background: rgba(118,255,3,0.04);
+  }
+
+  .p-tagline {
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: center;
+    gap: 6px;
+    padding: 32px;
+  }
+  .p-tagline .line1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    letter-spacing: -1px;
+    color: var(--white);
+    line-height: 1.1;
+    text-align: center;
+  }
+  .p-tagline .line2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--lime);
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  .p-color {
+    grid-column: 3;
+    grid-row: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 9px;
+    padding: 28px 20px;
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .swatch .chip {
+    width: 50px; height: 50px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .swatch .hex {
+    font-size: 8.5px;
+    color: var(--gray-mid);
+    text-align: center;
+  }
+  .gradient-strip {
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--cyan), color-mix(in srgb, var(--cyan) 60%, var(--lime)), var(--lime));
+  }
+
+  .p-type {
+    padding: 24px 20px;
+    gap: 14px;
+    align-items: stretch;
+  }
+  .p-type .spec {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.5px;
+  }
+  .p-type .spec-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--lime);
+    letter-spacing: 0;
+  }
+  .p-type .alpha {
+    font-size: 9px;
+    color: var(--gray-mid);
+    letter-spacing: 1.2px;
+    line-height: 2.1;
+  }
+
+  .p-image {
+    grid-column: 1;
+    grid-row: 3;
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .p-badges {
+    padding: 24px;
+    gap: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ═══ PANEL 1: LOGO COVER ═══ -->
+  <div class="panel p-logo">
+    <div class="panel-label">01 · mark</div>
+    <div class="panel-num">01</div>
+    <div class="accent-line"></div>
+
+    <div class="logo-svg-wrap">
+      <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="120,16 212,68 212,172 120,224 28,172 28,68"
+                 fill="none" stroke="#00e5ff" stroke-width="1.4" opacity="0.35"/>
+        <polygon points="120,42 186,79 186,161 120,198 54,161 54,79"
+                 fill="none" stroke="#00e5ff" stroke-width="0.9" opacity="0.2"/>
+        <circle cx="120" cy="120" r="64" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.4"/>
+        <circle cx="120" cy="120" r="50" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.3"/>
+        <circle cx="120" cy="120" r="34" fill="none" stroke="#00e5ff" stroke-width="1.3" opacity="0.5"/>
+        <path d="M120,120 L120,56 A64,64 0 0,1 176,88"
+              fill="none" stroke="#00e5ff" stroke-width="1.4" opacity="0.25"/>
+        <line x1="82" y1="62" x2="82" y2="152" stroke="#76ff03" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M82,128 Q82,90 120,90 Q158,90 158,128" fill="none" stroke="#76ff03" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="158" y1="128" x2="158" y2="152" stroke="#76ff03" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="74" y1="76" x2="90" y2="76" stroke="#76ff03" stroke-width="1.5" opacity="0.7"/>
+        <line x1="74" y1="96" x2="90" y2="96" stroke="#76ff03" stroke-width="1.5" opacity="0.7"/>
+        <line x1="74" y1="116" x2="90" y2="116" stroke="#76ff03" stroke-width="1.5" opacity="0.7"/>
+        <line x1="150" y1="96" x2="166" y2="96" stroke="#76ff03" stroke-width="1.5" opacity="0.7"/>
+        <line x1="150" y1="116" x2="166" y2="116" stroke="#76ff03" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="120" cy="120" r="4.5" fill="#00e5ff"/>
+        <circle cx="120" cy="120" r="9" fill="none" stroke="#00e5ff" stroke-width="0.7" opacity="0.5"/>
+        <line x1="120" y1="16" x2="120" y2="8" stroke="#00e5ff" stroke-width="0.8" opacity="0.4"/>
+        <line x1="28" y1="68" x2="20" y2="64" stroke="#00e5ff" stroke-width="0.8" opacity="0.4"/>
+        <line x1="212" y1="68" x2="220" y2="64" stroke="#00e5ff" stroke-width="0.8" opacity="0.4"/>
+        <line x1="28" y1="172" x2="20" y2="176" stroke="#00e5ff" stroke-width="0.8" opacity="0.4"/>
+        <line x1="120" y1="224" x2="120" y2="232" stroke="#00e5ff" stroke-width="0.8" opacity="0.4"/>
+      </svg>
+    </div>
+
+    <div class="wordmark">movers<span class="dot">.</span>help</div>
+    <div class="tagline-sub">AI-Powered Long Distance Moving</div>
+  </div>
+
+  <!-- ═══ PANEL 2: CONSTRUCTION ═══ -->
+  <div class="panel p-construction">
+    <div class="panel-label">02 · construction</div>
+    <div class="panel-num">02</div>
+    <div class="accent-line"></div>
+
+    <div class="construction-svg">
+      <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="cgrid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.4"/>
+          </pattern>
+        </defs>
+        <rect width="240" height="240" fill="url(#cgrid)" opacity="0.6"/>
+        <circle cx="120" cy="120" r="65" fill="none" stroke="#00e5ff" stroke-width="0.6" opacity="0.25" stroke-dasharray="4 4"/>
+        <circle cx="120" cy="120" r="52" fill="none" stroke="#00e5ff" stroke-width="0.6" opacity="0.25" stroke-dasharray="4 4"/>
+        <circle cx="120" cy="120" r="36" fill="none" stroke="#00e5ff" stroke-width="0.6" opacity="0.25" stroke-dasharray="4 4"/>
+        <polygon points="120,14 214,68 214,172 120,226 26,172 26,68"
+                 fill="none" stroke="#76ff03" stroke-width="0.6" opacity="0.2" stroke-dasharray="4 4"/>
+        <line x1="26" y1="120" x2="214" y2="120" stroke="#00e5ff" stroke-width="0.4" opacity="0.15"/>
+        <line x1="120" y1="14" x2="120" y2="226" stroke="#00e5ff" stroke-width="0.4" opacity="0.15"/>
+        <line x1="26" y1="68" x2="214" y2="172" stroke="#00e5ff" stroke-width="0.3" opacity="0.1"/>
+        <line x1="26" y1="172" x2="214" y2="68" stroke="#00e5ff" stroke-width="0.3" opacity="0.1"/>
+        <circle cx="120" cy="120" r="2" fill="#00e5ff"/>
+        <circle cx="120" cy="68" r="1.2" fill="#00e5ff" opacity="0.4"/>
+        <circle cx="120" cy="172" r="1.2" fill="#00e5ff" opacity="0.4"/>
+        <circle cx="26" cy="120" r="1.2" fill="#00e5ff" opacity="0.4"/>
+        <line x1="80" y1="60" x2="80" y2="160" stroke="#76ff03" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <path d="M80,130 Q80,88 120,88 Q160,88 160,130" fill="none" stroke="#76ff03" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="160" y1="130" x2="160" y2="160" stroke="#76ff03" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <text x="196" y="124" fill="#7a7a8c" font-size="7" font-family="JetBrains Mono">r₁=65</text>
+        <text x="194" y="58" fill="#7a7a8c" font-size="7" font-family="JetBrains Mono">r₂=52</text>
+        <text x="126" y="234" fill="#7a7a8c" font-size="7" font-family="JetBrains Mono">60° grid</text>
+      </svg>
+    </div>
+
+    <div class="construction-notes">
+      <div class="note"><span class="num">01</span><span><strong>Waypoint beacon</strong>Hex on 60° grid — the universal symbol for precise geolocation + intelligence</span></div>
+      <div class="note"><span class="num">02</span><span><strong>Radar rings</strong>Active scanning, real-time tracking. Every cubic foot accounted for in transit</span></div>
+      <div class="note"><span class="num">03</span><span><strong>"m" in lime</strong>Three strokes form the initial: two stems + arch. Negative space creates the letter</span></div>
+      <div class="note"><span class="num">04</span><span><strong>Measurement ticks</strong>Volume marks on stems — precision measurement built into the mark</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ PANEL 3: ICON SYSTEM ═══ -->
+  <div class="panel p-icons">
+    <div class="panel-label">03 · icon system</div>
+    <div class="panel-num">03</div>
+    <div class="accent-line"></div>
+
+    <div class="icon-row">
+      <div class="icon-stack">
+        <div class="icon-card">
+          <svg width="30" height="30" viewBox="0 0 240 240">
+            <polygon points="120,26 198,70 198,158 120,202 42,158 42,70" fill="none" stroke="#00e5ff" stroke-width="5" opacity="0.5"/>
+            <circle cx="120" cy="114" r="28" fill="none" stroke="#76ff03" stroke-width="4"/>
+            <circle cx="120" cy="114" r="6" fill="#76ff03"/>
+          </svg>
+        </div>
+        <div class="icon-card-label">App Icon</div>
+      </div>
+      <div class="icon-stack">
+        <div class="icon-card round">
+          <svg width="28" height="28" viewBox="0 0 240 240">
+            <circle cx="120" cy="120" r="90" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.4"/>
+            <circle cx="120" cy="120" r="58" fill="none" stroke="#00e5ff" stroke-width="3.5" opacity="0.55"/>
+            <circle cx="120" cy="120" r="22" fill="#76ff03"/>
+            <line x1="120" y1="30" x2="120" y2="14" stroke="#00e5ff" stroke-width="2.5" opacity="0.35"/>
+            <line x1="210" y1="120" x2="226" y2="120" stroke="#00e5ff" stroke-width="2.5" opacity="0.35"/>
+            <line x1="120" y1="210" x2="120" y2="226" stroke="#00e5ff" stroke-width="2.5" opacity="0.35"/>
+            <line x1="30" y1="120" x2="14" y2="120" stroke="#00e5ff" stroke-width="2.5" opacity="0.35"/>
+          </svg>
+        </div>
+        <div class="icon-card-label">Beacon</div>
+      </div>
+      <div class="icon-stack">
+        <div class="icon-card">
+          <svg width="28" height="28" viewBox="0 0 240 240">
+            <rect x="40" y="50" width="160" height="8" rx="2" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.6"/>
+            <rect x="40" y="80" width="140" height="8" rx="2" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.5"/>
+            <rect x="40" y="110" width="120" height="8" rx="2" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.4"/>
+            <rect x="40" y="140" width="100" height="8" rx="2" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.3"/>
+            <rect x="40" y="170" width="80" height="8" rx="2" fill="none" stroke="#76ff03" stroke-width="4" opacity="0.7"/>
+            <line x1="120" y1="50" x2="120" y2="178" stroke="#76ff03" stroke-width="1.5" opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="icon-card-label">Volume</div>
+      </div>
+      <div class="icon-stack">
+        <div class="icon-card">
+          <svg width="28" height="28" viewBox="0 0 240 240">
+            <path d="M30,190 L120,40 L210,190" fill="none" stroke="#00e5ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+            <polyline points="60,150 120,80 180,150" fill="none" stroke="#76ff03" stroke-width="3.5" stroke-linecap="round" opacity="0.65"/>
+            <circle cx="120" cy="160" r="7" fill="#00e5ff"/>
+            <circle cx="120" cy="40" r="5" fill="#76ff03"/>
+            <circle cx="30" cy="190" r="5" fill="#76ff03" opacity="0.7"/>
+            <circle cx="210" cy="190" r="5" fill="#00e5ff" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="icon-card-label">Route</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PANEL 4: TERMINAL ═══ -->
+  <div class="panel p-terminal">
+    <div class="panel-label">04 · digital surface</div>
+    <div class="panel-num">04</div>
+    <div class="accent-line"></div>
+
+    <div class="term">
+      <div class="term-bar">
+        <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+        <span class="term-title">movers.help ~ v2.4.1</span>
+      </div>
+      <div class="term-body">
+        <div><span class="td">λ</span> <span class="tc">movers</span> <span class="tw">scan</span> <span class="td">--rooms=all --precision=high</span></div>
+        <div style="margin:3px 0;"><span class="td">│</span> <span class="tw">Scanning...</span> <span class="tl">1,200 ft³</span> <span class="td">total volume detected</span></div>
+        <div><span class="td">│</span></div>
+        <div><span class="td">λ</span> <span class="tc">movers</span> <span class="tw">estimate</span> <span class="td">--from</span> <span class="tc">NYC</span> <span class="td">--to</span> <span class="tc">LA</span> <span class="td">--volume</span> <span class="tl">1200ft3</span></div>
+        <div><span class="td">├─</span> <span class="tw">Route:</span> <span class="tc">NYC → CHI → DEN → LA</span> <span class="td">4,491km</span></div>
+        <div><span class="td">├─</span> <span class="tw">Carriers:</span> <span class="tl">3 matched</span> <span class="td">· avg 4.8★</span></div>
+        <div><span class="td">├─</span> <span class="tw">Estimate:</span> <span class="tl">$3,240–$4,100</span></div>
+        <div><span class="td">└─</span> <span class="tw">ETA:</span> <span class="tc">4 days</span> <span class="td">· confidence</span> <span class="tl">94%</span> <span class="td">(v3.2)</span></div>
+        <div style="margin-top:6px;"><span class="tc">λ</span><span class="tcursor"></span></div>
+      </div>
+    </div>
+
+    <div class="chip-row">
+      <span class="chip">SCAN</span>
+      <span class="chip">ESTIMATE</span>
+      <span class="chip lime">1,200FT³</span>
+      <span class="chip">TRACK</span>
+      <span class="chip lime">ROUTE</span>
+      <span class="chip lime">3 CARRIERS</span>
+    </div>
+  </div>
+
+  <!-- ═══ PANEL 5: TAGLINE ═══ -->
+  <div class="panel p-tagline">
+    <div class="panel-label">05 · essence</div>
+    <div class="panel-num">05</div>
+    <div class="accent-line"></div>
+    <div class="line1">Your stuff,</div>
+    <div class="line1">scanned.</div>
+    <div class="line2">The real price. Before the truck arrives.</div>
+  </div>
+
+  <!-- ═══ PANEL 6: COLOR SYSTEM ═══ -->
+  <div class="panel p-color">
+    <div class="panel-label">06 · palette</div>
+    <div class="panel-num">06</div>
+    <div class="accent-line"></div>
+    <div class="swatch"><div class="chip" style="background:#08080e;"></div><span class="hex">#08080E</span></div>
+    <div class="swatch"><div class="chip" style="background:#00e5ff;"></div><span class="hex">#00E5FF</span></div>
+    <div class="swatch"><div class="chip" style="background:#76ff03;"></div><span class="hex">#76FF03</span></div>
+    <div class="swatch"><div class="chip" style="background:#0c0c16;"></div><span class="hex">#0C0C16</span></div>
+    <div class="swatch"><div class="chip" style="background:#7a7a8c;"></div><span class="hex">#7A7A8C</span></div>
+    <div class="swatch"><div class="chip" style="background:#f0f0f5;"></div><span class="hex">#F0F0F5</span></div>
+    <div class="gradient-strip"></div>
+  </div>
+
+  <!-- ═══ PANEL 7: TYPOGRAPHY ═══ -->
+  <div class="panel p-type">
+    <div class="panel-label">07 · typography</div>
+    <div class="panel-num">07</div>
+    <div class="accent-line"></div>
+    <div class="spec">movers.help</div>
+    <div class="spec-mono">Volume: 1,200 ft³ · ETA: 4 days</div>
+    <div style="font-size:8px;color:var(--gray-mid);letter-spacing:1.5px;margin-top:6px;">DISPLAY · SPACE GROTESK BOLD</div>
+    <div style="font-size:8px;color:var(--lime);letter-spacing:1.5px;">UI + CODE · JETBRAINS MONO</div>
+    <div class="alpha">
+      A B C D E F G H I J K L M N O P Q R S T U V W X Y Z<br>
+      a b c d e f g h i j k l m n o p q r s t u v w x y z<br>
+      0 1 2 3 4 5 6 7 8 9 · / ? ! &amp; @ # $ % ^ * ( ) [ ] { }
+    </div>
+  </div>
+
+  <!-- ═══ PANEL 8: IMAGE DIRECTION ═══ -->
+  <div class="panel p-image">
+    <div class="panel-label" style="z-index:3;">08 · atmosphere</div>
+    <div class="panel-num" style="z-index:3;">08</div>
+    <div class="accent-line" style="z-index:3;"></div>
+
+    <svg width="100%" height="100%" viewBox="0 0 440 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="dots" width="5" height="5" patternUnits="userSpaceOnUse">
+          <circle cx="2.5" cy="2.5" r="0.8" fill="#1a1a2e"/>
+        </pattern>
+        <radialGradient id="vignette" cx="0.5" cy="0.55" r="0.55">
+          <stop offset="0%" stop-color="#0c0c1a"/>
+          <stop offset="100%" stop-color="#04040a"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <rect width="440" height="300" fill="url(#vignette)"/>
+      <rect width="440" height="300" fill="url(#dots)" opacity="0.7"/>
+
+      <g opacity="0.4">
+        <rect x="30" y="40" width="55" height="25" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="95" y="28" width="35" height="45" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="145" y="48" width="65" height="20" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="225" y="22" width="40" height="55" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="280" y="42" width="50" height="30" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="345" y="35" width="60" height="38" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="20" y="90" width="40" height="50" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="75" y="82" width="60" height="35" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="150" y="100" width="45" height="32" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="210" y="85" width="50" height="55" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="280" y="95" width="65" height="35" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="360" y="78" width="50" height="50" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="40" y="172" width="50" height="30" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="105" y="162" width="65" height="45" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="185" y="180" width="40" height="28" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="240" y="165" width="55" height="40" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+        <rect x="310" y="178" width="70" height="32" fill="none" stroke="#1a1a30" stroke-width="0.8"/>
+      </g>
+
+      <path d="M55,52 L55,115 L90,115 L90,150 L130,150 L130,200"
+            fill="none" stroke="#00e5ff" stroke-width="1.4" opacity="0.65" filter="url(#glow)"/>
+      <path d="M160,58 L160,132 L195,132 L195,192"
+            fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.45" filter="url(#glow)"/>
+      <path d="M260,30 L260,90 L230,90 L230,175 L270,175 L270,210"
+            fill="none" stroke="#00e5ff" stroke-width="1.1" opacity="0.55" filter="url(#glow)"/>
+
+      <circle cx="160" cy="58" r="4" fill="#00e5ff" opacity="0.8"/>
+      <circle cx="160" cy="58" r="8" fill="none" stroke="#00e5ff" stroke-width="0.7" opacity="0.4"/>
+      <circle cx="260" cy="90" r="3.5" fill="#00e5ff" opacity="0.75"/>
+      <circle cx="260" cy="90" r="7" fill="none" stroke="#00e5ff" stroke-width="0.7" opacity="0.35"/>
+      <circle cx="195" cy="192" r="3" fill="#76ff03" opacity="0.7"/>
+      <circle cx="130" cy="200" r="2.5" fill="#76ff03" opacity="0.55"/>
+
+      <circle cx="260" cy="30" r="3" fill="#76ff03"/>
+      <circle cx="260" cy="30" r="6" fill="none" stroke="#76ff03" stroke-width="0.7" opacity="0.5"/>
+      <circle cx="260" cy="30" r="10" fill="none" stroke="#76ff03" stroke-width="0.4" opacity="0.25"/>
+      <circle cx="55" cy="207" r="3" fill="#00e5ff" opacity="0.8"/>
+      <circle cx="55" cy="207" r="8" fill="none" stroke="#00e5ff" stroke-width="0.6" opacity="0.35"/>
+
+      <g opacity="0.04">
+        <line x1="0" y1="0" x2="440" y2="0" stroke="white" stroke-width="1"/>
+        <line x1="0" y1="3" x2="440" y2="3" stroke="white" stroke-width="1"/>
+        <line x1="0" y1="6" x2="440" y2="6" stroke="white" stroke-width="1"/>
+        <line x1="0" y1="9" x2="440" y2="9" stroke="white" stroke-width="1"/>
+        <line x1="0" y1="12" x2="440" y2="12" stroke="white" stroke-width="1"/>
+        <line x1="0" y1="15" x2="440" y2="15" stroke="white" stroke-width="1"/>
+      </g>
+
+      <g transform="translate(360,240)" opacity="0.15">
+        <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="none" stroke="#00e5ff" stroke-width="1"/>
+        <circle cx="0" cy="0" r="7" fill="none" stroke="#76ff03" stroke-width="1"/>
+        <circle cx="0" cy="0" r="2" fill="#00e5ff"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ═══ PANEL 9: BADGES ═══ -->
+  <div class="panel p-badges">
+    <div class="panel-label">09 · badges</div>
+    <div class="panel-num">09</div>
+    <div class="accent-line"></div>
+
+    <svg width="90" height="90" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="94" fill="none" stroke="#161626" stroke-width="1"/>
+      <circle cx="100" cy="100" r="86" fill="none" stroke="#161626" stroke-width="0.5"/>
+      <polygon points="100,14 174,56 174,144 100,186 26,144 26,56"
+               fill="none" stroke="#00e5ff" stroke-width="1.4" opacity="0.45"/>
+      <polygon points="100,34 158,67 158,133 100,166 42,133 42,67"
+               fill="none" stroke="#00e5ff" stroke-width="0.8" opacity="0.25"/>
+      <circle cx="100" cy="100" r="38" fill="none" stroke="#76ff03" stroke-width="1.2" opacity="0.45"/>
+      <circle cx="100" cy="100" r="26" fill="none" stroke="#76ff03" stroke-width="0.8" opacity="0.55"/>
+      <line x1="82" y1="72" x2="82" y2="128" stroke="#00e5ff" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M82,105 Q82,85 100,85 Q118,85 118,105" fill="none" stroke="#00e5ff" stroke-width="2.8" stroke-linecap="round"/>
+      <line x1="118" y1="105" x2="118" y2="128" stroke="#00e5ff" stroke-width="2.8" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="2.5" fill="#76ff03"/>
+      <text x="100" y="174" text-anchor="middle" fill="#7a7a8c" font-size="7.5" font-family="JetBrains Mono" letter-spacing="2.5">MOVERS.HELP</text>
+    </svg>
+
+    <div style="width:180px;height:38px;background:linear-gradient(135deg,#0c0c18,#14142a);border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;padding:0 14px;gap:8px;">
+      <svg width="18" height="18" viewBox="0 0 240 240">
+        <polygon points="120,26 198,70 198,158 120,202 42,158 42,70" fill="none" stroke="#00e5ff" stroke-width="5"/>
+        <circle cx="120" cy="114" r="18" fill="none" stroke="#76ff03" stroke-width="3.5"/>
+        <circle cx="120" cy="114" r="5" fill="#76ff03"/>
+      </svg>
+      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:#f0f0f5;">movers<span style="color:#00e5ff;">.</span>help</span>
+    </div>
+
+    <div style="display:flex;gap:3px;opacity:0.12;margin-top:4px;">
+      <div style="width:7px;height:7px;border:1px solid #00e5ff;"></div>
+      <div style="width:7px;height:7px;border:1px solid #00e5ff;"></div>
+      <div style="width:7px;height:7px;background:#76ff03;"></div>
+      <div style="width:7px;height:7px;border:1px solid #00e5ff;"></div>
+      <div style="width:7px;height:7px;border:1px solid #00e5ff;"></div>
+      <div style="width:7px;height:7px;background:#00e5ff;opacity:0.5;"></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

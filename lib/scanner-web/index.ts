@@ -13,13 +13,13 @@ export type {
 
 export { normalizeClass, toInventoryLabel } from "./label-map";
 export { createWebScanner } from "./orchestrator";
-export { InventoryManager } from "./inventory-state";
+export { InventoryManager, mapRawDetections, buildRoomSummary } from "./inventory-state";
 
 // Spatial modules (Phase 2)
 export { SpatialTracker } from "./spatial/spatial-tracker";
 export type { TrackedItem, TrackResult, TrackerConfig } from "./spatial/spatial-tracker";
 export { DuplicateGuard } from "./spatial/duplicate-guard";
-export type { DuplicateGuardConfig, DuplicateResult, Position3d } from "./spatial/duplicate-guard";
+export type { DuplicateGuardConfig, DuplicateResult } from "./spatial/duplicate-guard";
 export { RoomMapper } from "./spatial/room-mapper";
 export { estimatePosition3d } from "./spatial/position-estimator";
 export type { Position3D } from "./spatial/position-estimator";

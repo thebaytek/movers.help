@@ -1,10 +1,14 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Grid, Edges } from "@react-three/drei";
-import { useRef, forwardRef, useImperativeHandle } from "react";
+import { OrbitControls, Grid } from "@react-three/drei";
+import { useRef, forwardRef, useImperativeHandle, useMemo } from "react";
 import type { TruckConfig, TruckLoadItem } from "@/types";
 import * as THREE from "three";
+import { TruckModel } from "./truck-model";
+import { FurnitureGeometry } from "./furniture-geometry";
+import { ScanPlane } from "./scan-plane";
+import { WaypointMarker } from "./waypoint-marker";
 
 interface TruckCanvasProps {
   items: (TruckLoadItem & { position?: [number, number, number] })[];
@@ -16,6 +20,11 @@ export interface TruckCanvasHandle {
   resetCamera: () => void;
   toggleAutoRotate: () => void;
 }
+
+// ── Brand colors ──
+const GREEN = "#76ff03";
+const DARK_GREEN = "#0a5e00";
+const VOID = "#08080e";
 
 const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
   function TruckCanvas({ items, config, autoRotate = true }, ref) {
@@ -32,10 +41,24 @@ const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
       },
     }));
 
+    const waypointPositions = useMemo(() => {
+      const positions: [number, number, number][] = [];
+      const y = -config.height / 2 - 0.4;
+      const z0 = config.cargoStartZ ?? 0;
+      const z1 = z0 + (config.cargoLength ?? config.length);
+      positions.push([-config.width / 2 - 1, y, z0]);
+      positions.push([config.width / 2 + 1, y, z0]);
+      positions.push([-config.width / 2 - 1, y, z1]);
+      positions.push([config.width / 2 + 1, y, z1]);
+      return positions;
+    }, [config]);
+
+    const cargoMidZ = ((config.cargoStartZ ?? 0) + ((config.cargoStartZ ?? 0) + (config.cargoLength ?? config.length))) / 2;
+
     return (
       <Canvas
         camera={{
-          position: [config.width * 1.8, config.height * 0.8, config.length * 0.6],
+          position: [config.width * 1.8, config.height * 0.8, cargoMidZ + (config.cargoLength ?? config.length) * 0.5],
           fov: 50,
           near: 0.1,
           far: 200,
@@ -47,66 +70,15 @@ const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
       >
         <ambientLight intensity={0.4} />
         <directionalLight position={[10, 15, 10]} intensity={0.6} castShadow />
-        <hemisphereLight args={["#ffffff", "#0B1120", 0.3]} />
+        <hemisphereLight args={["#e2e8f0", VOID, 0.4]} />
 
-        {/* Truck wireframe */}
-        <group>
-          {/* Truck body outline */}
-          <mesh position={[0, config.height / 2, config.length / 2]}>
-            <boxGeometry args={[config.width, config.height, config.length]} />
-            <meshBasicMaterial
-              color={new THREE.Color("#22D3EE")}
-              transparent
-              opacity={0.08}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-          <Edges
-            visible
-            scale={1}
-            color="#22D3EE"
-            threshold={15}
-          >
-            <boxGeometry args={[config.width, config.height, config.length]} />
-          </Edges>
+        {/* Realistic truck model */}
+        <TruckModel config={config} />
 
-          {/* Floor */}
-          <mesh
-            position={[0, 0.01, config.length / 2]}
-            rotation={[-Math.PI / 2, 0, 0]}
-          >
-            <planeGeometry args={[config.width, config.length]} />
-            <meshBasicMaterial
-              color={new THREE.Color("#22D3EE")}
-              transparent
-              opacity={0.04}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
+        {/* Scanning plane */}
+        <ScanPlane config={config} />
 
-          {/* Front wall (cab end) */}
-          <mesh position={[0, config.height / 2, 0]}>
-            <planeGeometry args={[config.width, config.height]} />
-            <meshBasicMaterial
-              color={new THREE.Color("#22D3EE")}
-              transparent
-              opacity={0.06}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-
-          {/* Rear door frame */}
-          <mesh position={[-config.width / 2, config.height / 2, config.length]}>
-            <boxGeometry args={[0.15, config.height, 0.15]} />
-            <meshBasicMaterial color={new THREE.Color("#22D3EE")} transparent opacity={0.3} />
-          </mesh>
-          <mesh position={[config.width / 2, config.height / 2, config.length]}>
-            <boxGeometry args={[0.15, config.height, 0.15]} />
-            <meshBasicMaterial color={new THREE.Color("#22D3EE")} transparent opacity={0.3} />
-          </mesh>
-        </group>
-
-        {/* Cargo boxes */}
+        {/* Cargo items — now rendered as furniture shapes */}
         {items.map((item) => (
           <group
             key={item.id}
@@ -116,34 +88,32 @@ const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
                 : [0, item.dimensions[1] / 2, 2 + Math.random() * config.length]
             }
           >
-            <mesh>
-              <boxGeometry args={item.dimensions} />
-              <meshStandardMaterial
-                color={new THREE.Color(item.color)}
-                transparent
-                opacity={0.75}
-                roughness={0.5}
-                metalness={0.1}
-              />
-            </mesh>
-            <Edges scale={1} color="#ffffff" threshold={15}>
-              <boxGeometry args={item.dimensions} />
-            </Edges>
+            <FurnitureGeometry
+              label={item.label}
+              dimensions={item.dimensions}
+              color={item.color}
+            />
           </group>
         ))}
 
+        {/* Ground grid */}
         <Grid
-          position={[0, -config.height / 2 - 0.5, config.length / 2]}
+          position={[0, -config.height / 2 - 0.5, cargoMidZ]}
           args={[60, 40]}
           cellSize={2}
           cellThickness={0.5}
-          cellColor="#22D3EE"
+          cellColor={DARK_GREEN}
           sectionSize={10}
           sectionThickness={1}
-          sectionColor="#0E7490"
+          sectionColor={GREEN}
           fadeDistance={50}
           infiniteGrid
         />
+
+        {/* Waypoint markers */}
+        {waypointPositions.map((pos, i) => (
+          <WaypointMarker key={i} position={pos} />
+        ))}
 
         <OrbitControls
           ref={controlsRef}
@@ -153,7 +123,7 @@ const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
           maxDistance={60}
           autoRotate={autoRotate}
           autoRotateSpeed={0.8}
-          target={[0, config.height / 3, config.length / 2]}
+          target={[0, config.height / 3, cargoMidZ]}
         />
       </Canvas>
     );

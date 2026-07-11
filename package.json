@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --turbo -p 3000 -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
@@ -12,7 +12,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx lib/db/seed.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "kill": "pkill -f 'next dev' 2>/dev/null; pkill -f 'next-server' 2>/dev/null; echo 'dev server stopped'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

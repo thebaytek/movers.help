@@ -84,7 +84,7 @@ function StarRating({ rating }: { rating: number }) {
           className={`h-5 w-5 ${
             i < rating
               ? "fill-amber-400 text-amber-400"
-              : "fill-surface-200 dark:fill-surface-700 text-surface-200 dark:text-surface-700"
+              : "fill-surface-700 text-surface-700"
           }`}
         />
       ))}
@@ -187,25 +187,25 @@ export function Reviews() {
   return (
     <section
       id="reviews"
-      className="relative py-24 sm:py-32 overflow-hidden"
+      className="relative py-24 sm:py-32 overflow-hidden bg-[#0a0a0a]"
     >
-      <div className="absolute inset-0 bg-dots opacity-40 dark:opacity-30" />
+      <div className="absolute inset-0 bg-dots opacity-30" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-4xl font-bold tracking-tight font-display sm:text-5xl">
             <span className="gradient-text">What Our Customers Say</span>
           </h2>
-          <p className="mt-6 text-lg leading-relaxed text-surface-600 dark:text-surface-400 text-balance">
+          <p className="mt-6 text-lg leading-relaxed text-surface-400 text-balance">
             Real reviews from real moves. No fakes, no paid testimonials.
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-3">
             <StarRating rating={5} />
-            <span className="text-lg font-bold text-surface-900 dark:text-surface-100 font-display">
+            <span className="text-lg font-bold text-surface-100 font-display">
               {avgRating} out of 5
             </span>
-            <span className="text-sm text-surface-500 dark:text-surface-400">
+            <span className="text-sm text-surface-400">
               from {totalReviews.toLocaleString()}+ verified reviews
             </span>
           </div>
@@ -234,34 +234,34 @@ export function Reviews() {
                   opacity: { duration: 0.2 },
                 }}
               >
-                <Card className="relative overflow-hidden border-l-4 border-l-brand-500 dark:border-l-brand-400 p-8">
-                  <div className="absolute inset-0 bg-gradient-to-r from-brand-50/60 to-transparent dark:from-brand-950/40 dark:to-transparent" />
+                <Card className="relative overflow-hidden border-l-4 border-l-accent-500 p-8">
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent-950/40 to-transparent" />
 
                   <div className="relative">
                     <StarRating rating={review.rating} />
 
-                    <h3 className="mt-4 text-xl font-bold text-surface-900 dark:text-surface-100 font-display">
+                    <h3 className="mt-4 text-xl font-bold text-surface-100 font-display">
                       {review.title || "Great experience"}
                     </h3>
 
-                    <p className="mt-3 text-sm leading-relaxed text-surface-600 dark:text-surface-400">
+                    <p className="mt-3 text-sm leading-relaxed text-surface-400">
                       {truncate(review.body, 200)}
                     </p>
 
-                    <div className="mt-6 flex items-center justify-between border-t border-surface-200 dark:border-surface-800 pt-4">
+                    <div className="mt-6 flex items-center justify-between border-t border-surface-800 pt-4">
                       <div>
-                        <p className="text-sm font-semibold text-surface-900 dark:text-surface-100">
+                        <p className="text-sm font-semibold text-surface-100">
                           {review.customer_name}
                         </p>
                         {review.move_from_city && review.move_to_city && (
-                          <p className="mt-0.5 text-xs text-surface-500 dark:text-surface-400">
+                          <p className="mt-0.5 text-xs text-surface-400">
                             {review.move_from_city} → {review.move_to_city}
                           </p>
                         )}
                       </div>
 
                       {review.is_verified && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950/40 px-3 py-1 text-xs font-medium text-emerald-300">
                           <BadgeCheck className="h-3.5 w-3.5" />
                           Verified Move
                         </span>
@@ -277,17 +277,17 @@ export function Reviews() {
               <>
                 <button
                   onClick={() => paginate(-1)}
-                  className="absolute -left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-md hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
+                  className="absolute -left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-surface-800 border border-surface-700 shadow-md hover:bg-surface-700 transition-colors"
                   aria-label="Previous review"
                 >
-                  <ChevronLeft className="h-5 w-5 text-surface-600 dark:text-surface-400" />
+                  <ChevronLeft className="h-5 w-5 text-surface-400" />
                 </button>
                 <button
                   onClick={() => paginate(1)}
-                  className="absolute -right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-md hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
+                  className="absolute -right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-surface-800 border border-surface-700 shadow-md hover:bg-surface-700 transition-colors"
                   aria-label="Next review"
                 >
-                  <ChevronRight className="h-5 w-5 text-surface-600 dark:text-surface-400" />
+                  <ChevronRight className="h-5 w-5 text-surface-400" />
                 </button>
               </>
             )}
@@ -302,8 +302,8 @@ export function Reviews() {
                   onClick={() => goTo(i)}
                   className={`h-2.5 rounded-full transition-all duration-300 ${
                     i === current
-                      ? "w-8 bg-brand-500 dark:bg-brand-400"
-                      : "w-2.5 bg-surface-300 dark:bg-surface-700 hover:bg-surface-400 dark:hover:bg-surface-600"
+                      ? "w-8 bg-accent-500"
+                      : "w-2.5 bg-surface-700 hover:bg-surface-600"
                   }`}
                   aria-label={`Go to review ${i + 1}`}
                 />

@@ -61,6 +61,9 @@ export class InventoryManager {
   } {
     const trackResult = this.tracker.track(rawDetections, timestamp);
 
+    // Purge stale seen items to prevent unbounded growth
+    this.guard.removeStale(timestamp, 30000);
+
     const newConfirmations: WebDetection[] = [];
 
     for (const item of trackResult.newConfirmations) {
@@ -76,21 +79,15 @@ export class InventoryManager {
         this.guard.markSeen(item.trackingId, item.class, pos3d);
         this.mapper.assignItem(item.trackingId, pos3d);
 
-        // Estimate volume
-        let volumeCuFt = 0;
-        if (this.depthEstimator) {
-          const depth = this.depthEstimator.estimateDepth(item.bbox, 640, 480);
-          const vol = this.volumeCalc.estimate(
-            item.bbox,
-            toInventoryLabel(item.class),
-            depth.depthMeters,
-            depth.confidence,
-          );
-          volumeCuFt = vol.cuFt;
-        } else {
-          const vol = this.volumeCalc.estimate(item.bbox, toInventoryLabel(item.class));
-          volumeCuFt = vol.cuFt;
-        }
+        // Estimate volume (depth estimator is always initialized by initDepth())
+        const depth = this.depthEstimator!.estimateDepth(item.bbox, 640, 480);
+        const vol = this.volumeCalc.estimate(
+          item.bbox,
+          toInventoryLabel(item.class),
+          depth.depthMeters,
+          depth.confidence,
+        );
+        const volumeCuFt = vol.cuFt;
 
         const webDet: WebDetection = {
           trackingId: item.trackingId,
