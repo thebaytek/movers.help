@@ -258,13 +258,27 @@ export function QuoteSection() {
     setIsSubmitting(true);
     try {
       const body = {
-        ...values,
-        inventory,
-        totalItems,
+        moveFromCity: values.fromCity,
+        moveFromState: values.fromState,
+        moveToCity: values.toCity,
+        moveToState: values.toState,
+        moveDate: values.moveDate,
+        contactName: values.name,
+        contactEmail: values.email,
+        contactPhone: values.phone,
+        needsPacking: values.needsPacking,
+        needsStorage: values.needsStorage,
+        storageDays: values.storageDays,
+        accessibility: values.accessibility,
+        agreedQuote: quoteResult.estimatedTotal,
         totalCuFt,
-        distanceMiles: quoteResult.distanceMiles,
-        estimatedTotal: quoteResult.estimatedTotal,
-        breakdown: quoteResult.breakdown,
+        totalItems,
+        inventory: inventory.map((e) => ({
+          room: e.room,
+          item: e.item,
+          quantity: e.quantity,
+          cuFtPerItem: getCuFt(e.item),
+        })),
       };
       const res = await fetch("/api/leads", {
         method: "POST",
