@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layouts/theme-provider";
 import { Toaster } from "sonner";
+import MatrixRain from "@/components/landing/matrix-rain";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -97,6 +98,8 @@ export default function RootLayout({
       <body
         className={`${jakarta.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
+        {/* Matrix rain background — covers entire site */}
+        <MatrixRain />
         {/* Persistent green grid overlay — covers entire site */}
         <div className="fixed inset-0 z-0 pointer-events-none bg-grid scan-line-overlay" aria-hidden="true" />
         {/* Subtle green ambient glow behind content */}

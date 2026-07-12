@@ -18,16 +18,16 @@ type Glow = {
   alpha: number;
 };
 
-const GRID_SIZE = 40;
-const GRID_COLOR = "rgba(118, 255, 3, 0.04)";
-const FONT_SIZE = 14;
-const COL_GAP = 40;
-const MAX_DROPS = 80;
+const GRID_SIZE = 20;
+const GRID_COLOR = "rgba(118, 255, 3, 0.03)";
+const FONT_SIZE = 8;
+const COL_GAP = 18;
+const MAX_DROPS = 200;
 const CHARSET =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ";
-const GLOW_RADIUS = 3;
+const GLOW_RADIUS = 1.5;
 const GLOW_DECAY = 0.05;
-const GLOW_INITIAL = 0.4;
+const GLOW_INITIAL = 0.3;
 
 function randomChar(): string {
   return CHARSET[Math.floor(Math.random() * CHARSET.length)];
