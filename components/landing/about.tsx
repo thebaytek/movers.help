@@ -52,7 +52,7 @@ export function About() {
     <section
       id="about"
       ref={ref}
-      className="relative py-24 sm:py-32 overflow-hidden bg-[#08080e]"
+      className="relative py-24 sm:py-32 overflow-hidden"
     >
       <div className="absolute inset-0 bg-dots opacity-40" />
 

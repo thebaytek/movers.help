@@ -41,19 +41,19 @@ const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
       },
     }));
 
+    const cargoStartZ = config.cargoStartZ ?? 0;
+    const cargoEndZ = cargoStartZ + (config.cargoLength ?? config.length);
+    const cargoMidZ = (cargoStartZ + cargoEndZ) / 2;
+
     const waypointPositions = useMemo(() => {
       const positions: [number, number, number][] = [];
       const y = -config.height / 2 - 0.4;
-      const z0 = config.cargoStartZ ?? 0;
-      const z1 = z0 + (config.cargoLength ?? config.length);
-      positions.push([-config.width / 2 - 1, y, z0]);
-      positions.push([config.width / 2 + 1, y, z0]);
-      positions.push([-config.width / 2 - 1, y, z1]);
-      positions.push([config.width / 2 + 1, y, z1]);
+      positions.push([-config.width / 2 - 1, y, cargoStartZ]);
+      positions.push([config.width / 2 + 1, y, cargoStartZ]);
+      positions.push([-config.width / 2 - 1, y, cargoEndZ]);
+      positions.push([config.width / 2 + 1, y, cargoEndZ]);
       return positions;
-    }, [config]);
-
-    const cargoMidZ = ((config.cargoStartZ ?? 0) + ((config.cargoStartZ ?? 0) + (config.cargoLength ?? config.length))) / 2;
+    }, [config, cargoStartZ, cargoEndZ]);
 
     return (
       <Canvas
@@ -68,9 +68,10 @@ const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
         className="rounded-2xl"
         style={{ background: "transparent" }}
       >
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[10, 15, 10]} intensity={0.6} castShadow />
-        <hemisphereLight args={["#e2e8f0", VOID, 0.4]} />
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[10, 15, 10]} intensity={0.8} castShadow />
+        <hemisphereLight args={["#e2e8f0", VOID, 0.5]} />
+        <pointLight position={[0, config.height * 0.6, cargoMidZ]} intensity={0.4} color="#00ff88" />
 
         {/* Realistic truck model */}
         <TruckModel config={config} />
@@ -85,7 +86,7 @@ const TruckCanvas = forwardRef<TruckCanvasHandle, TruckCanvasProps>(
             position={
               item.position
                 ? [item.position[0], item.position[1], item.position[2]]
-                : [0, item.dimensions[1] / 2, 2 + Math.random() * config.length]
+                : [0, item.dimensions[1] / 2, cargoStartZ + 1 + Math.random() * (cargoEndZ - cargoStartZ - 2)]
             }
           >
             <FurnitureGeometry

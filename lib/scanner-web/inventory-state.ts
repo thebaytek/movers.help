@@ -31,7 +31,7 @@ export class InventoryManager {
       classMatchRequired: true,
     });
     this.mapper = new RoomMapper();
-    this.volumeCalc = new VolumeCalculator({ minDepthConfidence: 0.4 });
+    this.volumeCalc = new VolumeCalculator({ minDepthConfidence: 0.6 });
   }
 
   get confirmedItems(): WebDetection[] {

@@ -32,7 +32,7 @@ function emptySession(
 
 export function createWebScanner(options?: WebScannerOptions): WebScanner {
   const confidenceThreshold = options?.confidenceThreshold ?? 0.5;
-  const fps = options?.fps ?? 5;
+  const fps = options?.fps ?? 30;
 
   let detector: IWebDetector | null = null;
   let camera: WebCamera | null = null;

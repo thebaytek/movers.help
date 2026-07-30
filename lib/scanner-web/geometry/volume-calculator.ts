@@ -19,8 +19,8 @@ export interface VolumeCalculatorConfig {
 }
 
 const DEFAULTS: VolumeCalculatorConfig = {
-  minDepthConfidence: 0.4,
-  fallbackCuFt: 15,
+  minDepthConfidence: 0.6,
+  fallbackCuFt: 8,
 };
 
 export class VolumeCalculator {
@@ -53,12 +53,19 @@ export class VolumeCalculator {
     const fovH = (65 * Math.PI) / 180;
     const fovV = fovH * 0.75;
 
-    const widthM = 2 * depthMeters * Math.tan(fovH / 2) * bbox.w;
-    const heightM = 2 * depthMeters * Math.tan(fovV / 2) * bbox.h;
+    // Clamp depth-based dimensions to reasonable furniture sizes
+    let widthM = 2 * depthMeters * Math.tan(fovH / 2) * bbox.w;
+    let heightM = 2 * depthMeters * Math.tan(fovV / 2) * bbox.h;
+
+    // Sanity clamps: allow large items like sectionals (up to ~4m wide, ~3m tall)
+    widthM = Math.max(0.2, Math.min(widthM, 4));
+    heightM = Math.max(0.2, Math.min(heightM, 3));
+
     const depthObjM = ((widthM + heightM) / 2) * 0.6;
 
     const cuM = widthM * heightM * depthObjM;
-    const cuFt = Math.max(1, Math.round(cuM * 35.315));
+    // Cap at 200 cu ft — covers large sectionals (~135 cu ft) with headroom
+    const cuFt = Math.max(1, Math.min(Math.round(cuM * 35.315), 200));
 
     return { cuFt, method: "depth", confidence: 0.7 };
   }
@@ -72,7 +79,9 @@ export class VolumeCalculator {
 
     // 2. Fall back to local getCuFt() lookup table
     // getCuFt() always returns a number (defaults to 15 for unknown items)
-    const cuFt = getCuFt(inventoryLabel);
+    const rawCuFt = getCuFt(inventoryLabel);
+    // Use our own fallbackCuFt config if getCuFt returned its generic default
+    const cuFt = rawCuFt >= 15 ? this.config.fallbackCuFt : rawCuFt;
     return { cuFt, method: "lookup", confidence: 0.75 };
   }
 }

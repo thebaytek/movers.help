@@ -35,7 +35,7 @@ function OBJModel({ objPath, mtlPath, scale }: { objPath: string; mtlPath: strin
   box.getCenter(center);
   processed.position.set(-center.x, -box.min.y, -center.z);
 
-  // ponytail: ghost-truck look — green, near-transparent fill + bright edge outlines
+  // ponytail: ghost-truck look — green, semi-transparent fill + bright edge outlines
   processed.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
 
@@ -43,10 +43,10 @@ function OBJModel({ objPath, mtlPath, scale }: { objPath: string; mtlPath: strin
     child.material = new THREE.MeshStandardMaterial({
       color: new THREE.Color("#00ff88"),
       transparent: true,
-      opacity: 0.15,
-      roughness: 0.3,
-      metalness: 0.1,
-      depthWrite: false,
+      opacity: 0.35,
+      roughness: 0.2,
+      metalness: 0.2,
+      depthWrite: true,
     });
 
     // Overlay edge outlines
@@ -56,7 +56,7 @@ function OBJModel({ objPath, mtlPath, scale }: { objPath: string; mtlPath: strin
       new THREE.LineBasicMaterial({
         color: "#00ff88",
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.9,
         depthTest: true,
       })
     );

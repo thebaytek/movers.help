@@ -170,7 +170,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#08080e]">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0" />
 
       <FloatingOrb

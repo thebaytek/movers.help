@@ -3,11 +3,11 @@ import type { TruckConfig, TruckLoadItem } from "@/types";
 export const TRUCK_26FT: TruckConfig = {
   name: "26' Box Truck",
   length: 26,
-  width: 8,
+  width: 5,           // matches box-truck.obj cargo width after centering + 3x scale (~4.92)
   height: 9,
   maxCuFt: 1872,
-  cargoStartZ: 7,     // cab takes ~7ft, cargo starts behind it
-  cargoLength: 19,    // ~19ft of actual cargo space
+  cargoStartZ: -13.5,  // rear of cargo box in model coords (after OBJ centering + 3x scale)
+  cargoLength: 22,     // actual cargo length from model: rear(-13.5) to front(8.5) = 22
   modelPath: "/models/box-truck.obj",
   modelMtlPath: "/models/box-truck.mtl",
   modelScale: 3.0,
@@ -19,8 +19,7 @@ export const TRUCK_53FT: TruckConfig = {
   width: 8.5,
   height: 9,
   maxCuFt: 4054,
-  modelPath: "/models/53ft-trailer.glb",
-  modelScale: 1.0,
+  // model file not yet purchased — falls back to procedural
 };
 
 export const ROOM_COLORS: Record<string, string> = {
@@ -134,7 +133,7 @@ export function generateDemoInventory(): TruckLoadItem[] {
     { id: "demo-1", label: "Queen Bed", cuFt: 60, dimensions: [4, 2.5, 3], color: ROOM_COLORS["Bedroom"], room: "Bedroom" },
     { id: "demo-2", label: "Dresser", cuFt: 40, dimensions: [3.5, 3, 2], color: ROOM_COLORS["Bedroom"], room: "Bedroom" },
     { id: "demo-3", label: "Nightstand", cuFt: 10, dimensions: [1.5, 2, 1.5], color: ROOM_COLORS["Bedroom"], room: "Bedroom" },
-    { id: "demo-4", label: "Sofa (3-Seat)", cuFt: 60, dimensions: [6, 3, 2.5], color: ROOM_COLORS["Living Room"], room: "Living Room" },
+    { id: "demo-4", label: "Sofa (3-Seat)", cuFt: 60, dimensions: [4.5, 2.5, 3.5], color: ROOM_COLORS["Living Room"], room: "Living Room" },
     { id: "demo-5", label: "Coffee Table", cuFt: 15, dimensions: [3, 1.5, 2], color: ROOM_COLORS["Living Room"], room: "Living Room" },
     { id: "demo-6", label: "TV Stand", cuFt: 20, dimensions: [3, 2, 1.5], color: ROOM_COLORS["Living Room"], room: "Living Room" },
     { id: "demo-7", label: "Bookshelf", cuFt: 30, dimensions: [2.5, 5, 1.5], color: ROOM_COLORS["Living Room"], room: "Living Room" },
@@ -150,7 +149,7 @@ export function generateDemoInventory(): TruckLoadItem[] {
     { id: "demo-17", label: "Lamp", cuFt: 5, dimensions: [1, 2.5, 1], color: ROOM_COLORS["Other"], room: "Other" },
     { id: "demo-18", label: "Suitcase", cuFt: 8, dimensions: [2, 1.5, 1.5], color: ROOM_COLORS["Other"], room: "Other" },
     { id: "demo-19", label: "Tool Chest", cuFt: 20, dimensions: [2.5, 3, 1.5], color: ROOM_COLORS["Garage"], room: "Garage" },
-    { id: "demo-20", label: "Bicycle", cuFt: 12, dimensions: [5, 3.5, 1], color: ROOM_COLORS["Garage"], room: "Garage" },
+    { id: "demo-20", label: "Bicycle", cuFt: 12, dimensions: [4, 3, 1.5], color: ROOM_COLORS["Garage"], room: "Garage" },
   ];
 }
 

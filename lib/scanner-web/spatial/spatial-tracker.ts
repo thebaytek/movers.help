@@ -19,12 +19,15 @@ export interface TrackerConfig {
   iouThreshold: number;
   maxMissedFrames: number;
   minConfirmations: number;
+  /** EMA smoothing factor for bbox interpolation (0–1). 0 = no smoothing, closer to 1 = heavier smoothing. */
+  bboxSmoothing: number;
 }
 
 const DEFAULTS: TrackerConfig = {
   iouThreshold: 0.3,
   maxMissedFrames: 5,
   minConfirmations: 2,
+  bboxSmoothing: 0.35,
 };
 
 function computeIoU(
@@ -89,7 +92,20 @@ export class SpatialTracker {
 
       const det = detections[pair.detIdx];
       const item = this.activeItems.get(pair.trackId)!;
-      item.bbox = det.bbox;
+
+      // EMA-smooth the bbox to eliminate jitter between frames
+      const alpha = this.config.bboxSmoothing;
+      if (item.confirmationCount > 0) {
+        item.bbox = {
+          x: item.bbox.x + (det.bbox.x - item.bbox.x) * alpha,
+          y: item.bbox.y + (det.bbox.y - item.bbox.y) * alpha,
+          w: item.bbox.w + (det.bbox.w - item.bbox.w) * alpha,
+          h: item.bbox.h + (det.bbox.h - item.bbox.h) * alpha,
+        };
+      } else {
+        item.bbox = det.bbox;
+      }
+
       item.lastSeenAt = timestamp;
       item.confidence = det.confidence;
       item.confirmationCount++;

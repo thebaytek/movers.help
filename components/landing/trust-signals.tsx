@@ -57,7 +57,7 @@ export function TrustSignals() {
   return (
     <section
       ref={ref}
-      className="relative py-24 sm:py-32 overflow-hidden bg-[#0c0c16]"
+      className="relative py-24 sm:py-32 overflow-hidden"
     >
       <div className="absolute inset-0 bg-surface-900/50" />
 

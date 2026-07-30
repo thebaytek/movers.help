@@ -180,6 +180,14 @@
       background: none;
     }
   }
+
+  /* Suppress matrix rain and grid on scan page for camera clarity and battery */
+  body[data-scan-page] canvas.fixed {
+    display: none;
+  }
+  body[data-scan-page] .bg-grid {
+    display: none;
+  }
 }
 
 @keyframes float {

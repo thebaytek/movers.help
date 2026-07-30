@@ -307,7 +307,7 @@ export function QuoteSection() {
 
   if (submitted) {
     return (
-      <section id="quote" className="py-24 px-4 bg-[#0c0c16]">
+      <section id="quote" className="py-24 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <motion.div
             initial={{ scale: 0 }}
@@ -355,7 +355,7 @@ export function QuoteSection() {
   }
 
   return (
-    <section id="quote" className="py-24 px-4 bg-[#0c0c16]">
+    <section id="quote" className="py-24 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl sm:text-5xl font-display font-bold text-[#76ff03] mb-4">

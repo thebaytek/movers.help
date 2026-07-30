@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createWebScanner, type ScannerSession } from "@/lib/scanner-web";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 const BACKEND_LABELS: Record<string, string> = {
   mediapipe: "LIVE: mediapipe",
@@ -21,28 +22,46 @@ export default function ScanPage() {
   const [session, setSession] = useState<ScannerSession | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentRoom, setCurrentRoom] = useState("Living Room");
-  const ROOMS = ["Living Room", "Kitchen", "Bedroom", "Bathroom", "Office", "Garage", "Other"];
+  const [currentRoom] = useState("Living Room");
+  const [statsOpen, setStatsOpen] = useState(false);
+
+  // Disable matrix rain / grid on this page for camera clarity and battery
+  useEffect(() => {
+    document.body.setAttribute("data-scan-page", "true");
+    return () => document.body.removeAttribute("data-scan-page");
+  }, []);
+
+  // Safety timeout: if loading takes >12s, show a fallback error
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => {
+      setError("Camera initialization timed out. Make sure you're on HTTPS or localhost and have granted camera permission.");
+      setLoading(false);
+    }, 12_000);
+    return () => clearTimeout(t);
+  }, [loading]);
 
   useEffect(() => {
     const scanner = createWebScanner();
     scannerRef.current = scanner;
     let mounted = true;
+    let disposed = false;
 
     (async () => {
       try {
         await scanner.initialize();
-        if (!containerRef.current || !mounted) return;
+        if (!containerRef.current || !mounted || disposed) return;
         await scanner.startCamera(containerRef.current);
+        if (!mounted || disposed) return;
         scanner.startScanning((s) => {
-          if (mounted) {
+          if (mounted && !disposed) {
             setSession(s);
             setLoading(false);
           }
         });
         scanner.setRoom("Living Room");
       } catch (e) {
-        if (mounted) {
+        if (mounted && !disposed) {
           setError(e instanceof Error ? e.message : "Camera failed");
           setLoading(false);
         }
@@ -51,6 +70,7 @@ export default function ScanPage() {
 
     return () => {
       mounted = false;
+      disposed = true;
       scanner.stopScanning();
       scanner.dispose();
     };
@@ -59,39 +79,43 @@ export default function ScanPage() {
   const backend = session?.backend ?? "simulated";
   const badgeColor = BACKEND_COLORS[backend];
   const badgeLabel = BACKEND_LABELS[backend];
+  const confirmedCount = session?.confirmedItems.length ?? 0;
 
   return (
-    <main className="relative h-screen bg-[#0B1120] overflow-hidden">
-      {/* Room picker */}
-      <div className="absolute top-4 left-0 right-0 z-30 flex justify-center pointer-events-none">
-        <div className="flex gap-1.5 overflow-x-auto px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-full border border-white/[0.06] max-w-full pointer-events-auto">
-          {ROOMS.map((room) => (
-            <button
-              key={room}
-              onClick={() => {
-                setCurrentRoom(room);
-                scannerRef.current?.setRoom(room);
-              }}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                currentRoom === room
-                  ? "bg-cyan-400 text-[#0B1120]"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]"
-              }`}
-            >
-              {room}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Camera container */}
+    <main className="relative h-screen min-h-screen bg-surface-950 overflow-hidden select-none">
+      {/* Camera container — full screen */}
       <div ref={containerRef} className="absolute inset-0" />
+
+      {/* Top bar: room + cu ft */}
+      <div
+        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3"
+        style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
+      >
+        {/* Room pill */}
+        <div className="glass px-3 py-1.5 backdrop-blur-md rounded-full flex items-center gap-1.5 min-h-[44px]">
+          <span className="w-2 h-2 rounded-full bg-accent-500 animate-pulse shrink-0" />
+          <span className="text-[11px] sm:text-xs font-semibold text-accent-500 uppercase tracking-wider">
+            {currentRoom}
+          </span>
+        </div>
+
+        {/* Cu ft pill */}
+        {session && confirmedCount > 0 && (
+          <div className="glass rounded-full px-3 py-1.5 backdrop-blur-md flex items-center gap-1.5 min-h-[44px]">
+            <span className="text-[10px] uppercase tracking-wider text-surface-500">Total</span>
+            <span className="text-sm font-bold text-accent-500 tabular-nums">
+              {session.totalCuFt}
+            </span>
+            <span className="text-[10px] text-surface-400">cu ft</span>
+          </div>
+        )}
+      </div>
 
       {/* Bbox overlays */}
       {session?.detections.map((d) => (
         <div
           key={`${d.trackingId}-${d.class}`}
-          className="absolute z-10 border-2 rounded"
+          className="absolute z-10 border-2 rounded pointer-events-none"
           style={{
             left: `${d.bbox.x * 100}%`,
             top: `${d.bbox.y * 100}%`,
@@ -101,74 +125,110 @@ export default function ScanPage() {
           }}
         >
           <span
-            className="absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[11px] font-bold whitespace-nowrap"
-            style={{ backgroundColor: badgeColor, color: "#0B1120" }}
+            className="absolute -top-5 sm:-top-6 left-1/2 -translate-x-1/2 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-bold whitespace-nowrap"
+            style={{ backgroundColor: badgeColor, color: "#08080e" }}
           >
             {d.inventoryLabel} · {Math.round(d.confidence * 100)}%
           </span>
         </div>
       ))}
 
-      {/* Loading */}
+      {/* Loading overlay */}
       {loading && !error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#0B1120]/85 z-20">
-          <p className="text-slate-400 text-base">Loading AI model…</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface-950 z-30 gap-3">
+          <div className="w-8 h-8 border-2 border-accent-500/30 border-t-accent-500 rounded-full animate-spin" />
+          <p className="text-surface-400 text-sm">Loading AI model…</p>
         </div>
       )}
 
-      {/* Error */}
+      {/* Error overlay */}
       {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0B1120]/85 z-20 px-8 gap-4">
-          <h2 className="text-slate-100 text-xl font-bold">Camera unavailable</h2>
-          <p className="text-slate-400 text-center">{error}</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface-950 z-30 px-6 gap-4">
+          <h2 className="text-surface-100 text-lg sm:text-xl font-bold text-center">
+            Camera unavailable
+          </h2>
+          <p className="text-surface-400 text-sm text-center max-w-xs">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-cyan-400 text-[#0B1120] font-bold px-6 py-3 rounded-full"
+            className="bg-accent-500 text-surface-950 font-semibold px-8 py-3 rounded-full text-sm min-h-[44px] active:scale-95 transition-transform"
           >
-            Retry
+            Try Again
           </button>
         </div>
       )}
 
-      {/* Backend badge */}
+      {/* Bottom panel — collapsible stats */}
       {session && !error && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-slate-800/85 px-4 py-2 rounded-lg z-20">
-          <p className="text-xs font-semibold" style={{ color: badgeColor }}>
-            {badgeLabel} · {session.detections.length} active · {session.confirmedItems.length} confirmed
-          </p>
-        </div>
-      )}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-30"
+          style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+        >
+          {/* Toggle button */}
+          <div className="flex justify-center">
+            <button
+              onClick={() => setStatsOpen(!statsOpen)}
+              className="glass rounded-t-xl px-6 py-2 flex items-center gap-1.5 min-h-[44px] active:scale-95 transition-transform"
+              aria-label={statsOpen ? "Hide stats" : "Show stats"}
+            >
+              <span className="text-[11px] text-surface-400 font-medium">
+                {confirmedCount} items · {session.totalCuFt} cu ft
+              </span>
+              {statsOpen ? (
+                <ChevronDown className="w-3.5 h-3.5 text-surface-400" />
+              ) : (
+                <ChevronUp className="w-3.5 h-3.5 text-surface-400" />
+              )}
+            </button>
+          </div>
 
-      {/* Cu ft counter */}
-      {session && session.confirmedItems.length > 0 && (
-        <div className="absolute top-4 right-4 z-30 bg-slate-900/85 backdrop-blur-md rounded-xl border border-cyan-400/20 px-4 py-2">
-          <p className="text-[10px] uppercase tracking-wider text-slate-500">Total</p>
-          <p className="text-lg font-bold text-cyan-400">{session.totalCuFt} <span className="text-xs font-normal text-slate-400">cu ft</span></p>
-        </div>
-      )}
+          {/* Expanded panel */}
+          {statsOpen && (
+            <div className="glass mx-3 rounded-xl p-4 mb-2 animate-slide-up">
+              {/* Backend badge */}
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] uppercase tracking-wider text-surface-500">
+                  Detector
+                </span>
+                <span
+                  className="text-[11px] font-semibold"
+                  style={{ color: badgeColor }}
+                >
+                  {badgeLabel}
+                </span>
+              </div>
 
-      {/* Room summary */}
-      {session && session.confirmedItems.length > 0 && (
-        <div className="absolute bottom-20 left-4 z-20 bg-slate-900/85 backdrop-blur-md rounded-xl border border-white/[0.06] p-3 max-w-[180px]">
-          <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2">Rooms</p>
-          {session.roomSummary.slice(0, 5).map((r) => (
-            <div key={r.room} className="flex justify-between items-center py-0.5">
-              <span className="text-[11px] text-slate-300 truncate mr-2">{r.room}</span>
-              <span className="text-[11px] text-slate-500">{r.itemCount}</span>
+              {/* Room breakdown */}
+              {session.roomSummary.length > 0 && (
+                <>
+                  <p className="text-[10px] uppercase tracking-wider text-surface-500 mb-2">
+                    Rooms
+                  </p>
+                  <div className="space-y-1">
+                    {session.roomSummary.map((r) => (
+                      <div
+                        key={r.room}
+                        className="flex justify-between items-center py-1 px-2 rounded-lg bg-surface-950/40"
+                      >
+                        <span className="text-xs text-surface-300">{r.room}</span>
+                        <span className="text-[11px] tabular-nums">
+                          <span className="text-surface-400">{r.itemCount}</span>
+                          <span className="text-surface-600 mx-1">·</span>
+                          <span className="text-accent-500">{r.cuFt}</span>
+                          <span className="text-surface-600 ml-0.5">ft³</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <p className="text-[10px] text-surface-600 text-center mt-3">
+                Everything processed on-device. No video leaves your phone.
+              </p>
             </div>
-          ))}
-          {session.roomSummary.length > 5 && (
-            <p className="text-[10px] text-slate-600 mt-1">
-              +{session.roomSummary.length - 5} more
-            </p>
           )}
         </div>
       )}
-
-      {/* Privacy notice */}
-      <p className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-slate-600 z-20">
-        Everything processed on-device. No video leaves your phone.
-      </p>
     </main>
   );
 }

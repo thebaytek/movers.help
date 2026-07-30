@@ -187,7 +187,7 @@ export function Reviews() {
   return (
     <section
       id="reviews"
-      className="relative py-24 sm:py-32 overflow-hidden bg-[#0a0a0a]"
+      className="relative py-24 sm:py-32 overflow-hidden"
     >
       <div className="absolute inset-0 bg-dots opacity-30" />
 
