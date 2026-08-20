@@ -24,7 +24,7 @@ export interface TrackerConfig {
 }
 
 const DEFAULTS: TrackerConfig = {
-  iouThreshold: 0.3,
+  iouThreshold: 0.25,
   maxMissedFrames: 5,
   minConfirmations: 2,
   bboxSmoothing: 0.35,

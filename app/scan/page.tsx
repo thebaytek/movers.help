@@ -31,12 +31,22 @@ export default function ScanPage() {
     return () => document.body.removeAttribute("data-scan-page");
   }, []);
 
-  // Safety timeout: if loading takes >12s, show a fallback error
+  // Safety timeout: if loading takes >12s, dispose the scanner and show an error.
+  // We use a ref so the main effect can detect the timeout even though the
+  // async closure would otherwise capture a stale `error` value.
+  const errorRef = useRef<string | null>(null);
   useEffect(() => {
     if (!loading) return;
     const t = setTimeout(() => {
-      setError("Camera initialization timed out. Make sure you're on HTTPS or localhost and have granted camera permission.");
+      const msg =
+        "Camera initialization timed out. Make sure you're on HTTPS or localhost and have granted camera permission.";
+      errorRef.current = msg;
+      setError(msg);
       setLoading(false);
+      // Stop any still-running model load / camera work so it can't "come
+      // alive" silently underneath the error overlay.
+      scannerRef.current?.dispose();
+      scannerRef.current = null;
     }, 12_000);
     return () => clearTimeout(t);
   }, [loading]);
@@ -50,9 +60,15 @@ export default function ScanPage() {
     (async () => {
       try {
         await scanner.initialize();
-        if (!containerRef.current || !mounted || disposed) return;
+        if (!containerRef.current || !mounted || disposed || errorRef.current) {
+          scanner.dispose();
+          return;
+        }
         await scanner.startCamera(containerRef.current);
-        if (!mounted || disposed) return;
+        if (!mounted || disposed || errorRef.current) {
+          scanner.dispose();
+          return;
+        }
         scanner.startScanning((s) => {
           if (mounted && !disposed) {
             setSession(s);
@@ -61,8 +77,9 @@ export default function ScanPage() {
         });
         scanner.setRoom("Living Room");
       } catch (e) {
-        if (mounted && !disposed) {
-          setError(e instanceof Error ? e.message : "Camera failed");
+        if (mounted && !disposed && !errorRef.current) {
+          errorRef.current = e instanceof Error ? e.message : "Camera failed";
+          setError(errorRef.current);
           setLoading(false);
         }
       }
@@ -73,6 +90,7 @@ export default function ScanPage() {
       disposed = true;
       scanner.stopScanning();
       scanner.dispose();
+      if (scannerRef.current === scanner) scannerRef.current = null;
     };
   }, []);
 

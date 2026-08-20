@@ -30,11 +30,37 @@ export async function startWebCamera(
   video.srcObject = stream;
   container.appendChild(video);
 
+  // Race-safe load: if frames are already available the `loadeddata` event
+  // may have fired before the handler was attached, so check readyState first.
+  // A hard timeout guarantees we never hang the scan page on a dead stream.
   await new Promise<void>((resolve, reject) => {
-    video.onloadeddata = () => resolve();
-    video.onerror = () => reject(new Error("Video failed to load"));
+    if (video.readyState >= 2) {
+      resolve();
+      return;
+    }
+    let settled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const finish = (fn: () => void) => () => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearTimeout(timer);
+      fn();
+    };
+    timer = setTimeout(
+      finish(() => reject(new Error("Video stream timed out while loading"))),
+      10_000,
+    );
+    video.onloadeddata = finish(resolve);
+    video.onerror = finish(() => reject(new Error("Video failed to load")));
   });
-  await video.play();
+
+  // Muted video should autoplay, but some browsers reject play() in edge
+  // cases — the element is already in the DOM, so don't fail the whole scan.
+  try {
+    await video.play();
+  } catch {
+    // continue; frames advance as soon as the browser allows playback
+  }
 
   return {
     video,

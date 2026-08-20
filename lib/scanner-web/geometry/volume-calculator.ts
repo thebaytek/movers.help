@@ -1,15 +1,21 @@
 import type { NormalizedBbox } from "../types";
 import { getCuFt } from "@/lib/inventory";
+import { getFurnitureCuFt } from "@/lib/furniture";
 import { lookupCuFtCached } from "../catalog";
 
 /**
  * Phase 3: Estimate cubic footage from bbox + depth.
- * Primary source: Supabase furniture_catalog (cached in-memory).
- * Fallback: local getCuFt() lookup table.
+ *
+ * Accuracy order (matches the canonical furniture table in lib/furniture.ts):
+ *   1. Known furniture label → exact cu ft from its real packed dimensions
+ *      (a scanned "couch" is a couch, not a guess from pixels).
+ *   2. Supabase furniture_catalog (cached in-memory) — legacy secondary source.
+ *   3. Depth/bbox heuristic — only for unknown classes, clamped to a sane
+ *      range because a monocular webcam has no true depth sensor.
  */
 export interface VolumeEstimate {
   cuFt: number;
-  method: "depth" | "catalog" | "lookup";
+  method: "lookup" | "catalog" | "depth";
   confidence: number;
 }
 
@@ -22,6 +28,10 @@ const DEFAULTS: VolumeCalculatorConfig = {
   minDepthConfidence: 0.6,
   fallbackCuFt: 8,
 };
+
+/** Sane bounds for depth-heuristic guesses (unknown items only). */
+const DEPTH_MIN_CUFT = 1;
+const DEPTH_MAX_CUFT = 40;
 
 export class VolumeCalculator {
   private config: VolumeCalculatorConfig;
@@ -36,6 +46,14 @@ export class VolumeCalculator {
     depthMeters?: number,
     depthConfidence?: number,
   ): VolumeEstimate {
+    // Known furniture → the table is authoritative. No pixel guessing needed.
+    const tableCuFt = getFurnitureCuFt(inventoryLabel);
+    if (tableCuFt != null) {
+      return { cuFt: tableCuFt, method: "lookup", confidence: 0.95 };
+    }
+
+    // Unknown class → try the depth heuristic only if its confidence is high
+    // enough, otherwise fall through to the catalog / generic fallback.
     if (
       depthMeters != null &&
       depthConfidence != null &&
@@ -43,6 +61,7 @@ export class VolumeCalculator {
     ) {
       return this.estimateFromDepth(bbox, depthMeters);
     }
+
     return this.estimateFromLookup(inventoryLabel);
   }
 
@@ -64,24 +83,34 @@ export class VolumeCalculator {
     const depthObjM = ((widthM + heightM) / 2) * 0.6;
 
     const cuM = widthM * heightM * depthObjM;
-    // Cap at 200 cu ft — covers large sectionals (~135 cu ft) with headroom
-    const cuFt = Math.max(1, Math.min(Math.round(cuM * 35.315), 200));
+    // Clamp hard — a monocular webcam overestimates tiny far-away bboxes badly,
+    // so cap unknown-item guesses at a conservative 40 cu ft.
+    const cuFt = Math.max(
+      DEPTH_MIN_CUFT,
+      Math.min(Math.round(cuM * 35.315), DEPTH_MAX_CUFT),
+    );
 
-    return { cuFt, method: "depth", confidence: 0.7 };
+    return { cuFt, method: "depth", confidence: 0.5 };
   }
 
   private estimateFromLookup(inventoryLabel: string): VolumeEstimate {
-    // 1. Try Supabase catalog (cached in-memory, highest confidence)
-    const catalogCuFt = lookupCuFtCached(inventoryLabel);
-    if (catalogCuFt != null) {
-      return { cuFt: catalogCuFt, method: "catalog", confidence: 0.95 };
+    // 1. Local furniture table (canonical). Usually already handled in
+    //    estimate(), but keep as a safety net.
+    const tableCuFt = getFurnitureCuFt(inventoryLabel);
+    if (tableCuFt != null) {
+      return { cuFt: tableCuFt, method: "lookup", confidence: 0.95 };
     }
 
-    // 2. Fall back to local getCuFt() lookup table
-    // getCuFt() always returns a number (defaults to 15 for unknown items)
+    // 2. Supabase catalog (cached in-memory, legacy secondary source)
+    const catalogCuFt = lookupCuFtCached(inventoryLabel);
+    if (catalogCuFt != null) {
+      return { cuFt: catalogCuFt, method: "catalog", confidence: 0.9 };
+    }
+
+    // 3. Generic fallback for truly unknown items
     const rawCuFt = getCuFt(inventoryLabel);
-    // Use our own fallbackCuFt config if getCuFt returned its generic default
     const cuFt = rawCuFt >= 15 ? this.config.fallbackCuFt : rawCuFt;
-    return { cuFt, method: "lookup", confidence: 0.75 };
+    return { cuFt, method: "lookup", confidence: 0.6 };
   }
 }
+

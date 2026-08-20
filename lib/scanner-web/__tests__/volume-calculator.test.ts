@@ -5,36 +5,48 @@ import type { NormalizedBbox } from "../types";
 describe("VolumeCalculator", () => {
   const calc = new VolumeCalculator({ minDepthConfidence: 0.4, fallbackCuFt: 15 });
 
-  describe("estimate (lookup fallback)", () => {
-    it("returns known cu ft for couch via lookup", () => {
+  describe("estimate (known furniture → canonical table)", () => {
+    it("returns exact cu ft for a sofa regardless of depth", () => {
       const bbox: NormalizedBbox = { x: 0.2, y: 0.3, w: 0.3, h: 0.25 };
-      const result = calc.estimate(bbox, "Sofa (3-seater)");
+      const result = calc.estimate(bbox, "Sofa (3-seater)", 2.0, 0.9);
       expect(result.method).toBe("lookup");
-      expect(result.cuFt).toBeGreaterThan(0);
-      expect(result.confidence).toBeGreaterThan(0.7);
+      expect(result.cuFt).toBe(64.3); // 86×38×34 in → packed cu ft
+      expect(result.confidence).toBeGreaterThan(0.9);
     });
 
-    it("returns known cu ft for dining chair", () => {
+    it("returns exact cu ft for a dining chair", () => {
       const bbox: NormalizedBbox = { x: 0.1, y: 0.1, w: 0.15, h: 0.2 };
       const result = calc.estimate(bbox, "Dining Chair");
       expect(result.method).toBe("lookup");
-      expect(result.cuFt).toBe(5);
+      expect(result.cuFt).toBe(9.2); // 20×22×36 in
+    });
+
+    it("returns exact cu ft for a tv stand", () => {
+      const result = calc.estimate(
+        { x: 0.1, y: 0.1, w: 0.2, h: 0.2 },
+        "TV Stand",
+      );
+      expect(result.cuFt).toBe(15); // 60×18×24 in
+    });
+
+    it("resolves COCO classes through the furniture table", () => {
+      expect(calc.estimate({ x: 0.1, y: 0.1, w: 0.2, h: 0.2 }, "couch").cuFt).toBe(64.3);
+      expect(calc.estimate({ x: 0.1, y: 0.1, w: 0.2, h: 0.2 }, "tv").cuFt).toBe(15);
     });
 
     it("falls back to default for unknown item", () => {
       const bbox: NormalizedBbox = { x: 0.1, y: 0.1, w: 0.2, h: 0.2 };
       const result = calc.estimate(bbox, "Random Object XYZ");
-      // Should fall back to the 15 default
       expect(result.cuFt).toBeGreaterThanOrEqual(15);
     });
   });
 
-  describe("estimate (depth-based)", () => {
-    it("uses depth when confidence is sufficient", () => {
+  describe("estimate (depth-based, unknown items only)", () => {
+    it("uses depth when confidence is sufficient for an unknown item", () => {
       const bbox: NormalizedBbox = { x: 0.2, y: 0.3, w: 0.3, h: 0.25 };
       const result = calc.estimate(
         bbox,
-        "Sofa (3-seater)",
+        "mystery object",
         2.0, // depth in meters
         0.7, // high confidence
       );
@@ -46,12 +58,12 @@ describe("VolumeCalculator", () => {
       const bbox: NormalizedBbox = { x: 0.2, y: 0.3, w: 0.3, h: 0.25 };
       const result = calc.estimate(
         bbox,
-        "Dining Chair",
+        "mystery object",
         2.0,
         0.2, // below 0.4 threshold
       );
       expect(result.method).toBe("lookup");
-      expect(result.cuFt).toBe(5);
+      expect(result.cuFt).toBe(15);
     });
 
     it("farther objects at same bbox size are physically larger", () => {
@@ -79,11 +91,16 @@ describe("VolumeCalculator", () => {
       const result = calc.estimate(tiny, "test", 1.0, 0.7);
       expect(result.cuFt).toBeGreaterThanOrEqual(1);
     });
+
+    it("caps unknown-item depth guesses at a conservative ceiling", () => {
+      const huge: NormalizedBbox = { x: 0.4, y: 0.4, w: 0.9, h: 0.9 };
+      const result = calc.estimate(huge, "test", 10.0, 0.7);
+      expect(result.cuFt).toBeLessThanOrEqual(40);
+    });
   });
 
   describe("config overrides", () => {
     it("uses fallbackCuFt when getCuFt returns default for unknown item", () => {
-      // getCuFt returns 15 for unknown items. Verify the fallback is that default.
       const custom = new VolumeCalculator({ fallbackCuFt: 15, minDepthConfidence: 0.4 });
       const result = custom.estimate(
         { x: 0.1, y: 0.1, w: 0.2, h: 0.2 },
@@ -96,9 +113,10 @@ describe("VolumeCalculator", () => {
       // Set threshold to 0.9 — our 0.7 confidence depth should fall back to lookup
       const strict = new VolumeCalculator({ minDepthConfidence: 0.9, fallbackCuFt: 15 });
       const bbox: NormalizedBbox = { x: 0.2, y: 0.3, w: 0.3, h: 0.25 };
-      const result = strict.estimate(bbox, "Dining Chair", 2.0, 0.7);
+      const result = strict.estimate(bbox, "mystery object", 2.0, 0.7);
       // 0.7 < 0.9 threshold → should use lookup
       expect(result.method).toBe("lookup");
     });
   });
 });
+

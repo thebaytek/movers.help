@@ -22,7 +22,7 @@ export class InventoryManager {
 
   constructor() {
     this.tracker = new SpatialTracker({
-      iouThreshold: 0.3,
+      iouThreshold: 0.25,
       maxMissedFrames: 5,
       minConfirmations: 2,
     });
