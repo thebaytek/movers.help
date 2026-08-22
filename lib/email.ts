@@ -1,6 +1,8 @@
 import { Resend } from "resend";
+import { env } from "@/lib/env";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
+const resendKey = env.RESEND_API_KEY;
+const resend = resendKey && resendKey !== "re_placeholder" ? new Resend(resendKey) : null;
 
 export async function sendLeadNotification(lead: {
   customerName: string;
@@ -11,9 +13,9 @@ export async function sendLeadNotification(lead: {
   moveToState: string;
   agreedQuote?: number;
 }) {
-  // Only send if Resend is configured
-  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
-    console.log("[Email] Skipping — no RESEND_API_KEY configured");
+  // Email is best-effort: skip until a real RESEND_API_KEY is configured.
+  if (!resend) {
+    console.log("[Email] Skipping — RESEND_API_KEY not configured");
     return;
   }
 

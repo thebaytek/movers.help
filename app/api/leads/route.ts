@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { sendLeadNotification } from "@/lib/email";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const leadSchema = z.object({
   moveFromCity: z.string().min(1),
@@ -26,6 +27,21 @@ const leadSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+
+    // Honeypot: hidden field — bots fill it, humans don't
+    if (body.website) {
+      return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+    }
+
+    // Rate limit: 5 submissions per 10 min per IP
+    const ip = getClientIp(request);
+    const rl = rateLimit(`leads:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: "Too many requests, please try again later" },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+      );
+    }
     const parsed = leadSchema.safeParse(body);
 
     if (!parsed.success) {

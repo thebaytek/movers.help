@@ -61,6 +61,7 @@ const stepThreeSchema = z.object({
   name: z.string().min(1, "Required"),
   email: z.string().email("Invalid email"),
   phone: z.string().min(10, "Enter a valid phone number"),
+  website: z.string().optional(),
 });
 
 const fullSchema = stepOneSchema.merge(stepThreeSchema);
@@ -140,6 +141,7 @@ export function QuoteSection() {
     resolver: zodResolver(fullSchema),
     defaultValues: {
       fromCity: "",
+      website: "",
       fromState: "",
       toCity: "",
       toState: "",
@@ -266,6 +268,7 @@ export function QuoteSection() {
         contactName: values.name,
         contactEmail: values.email,
         contactPhone: values.phone,
+        website: values.website,
         needsPacking: values.needsPacking,
         needsStorage: values.needsStorage,
         storageDays: values.storageDays,
@@ -806,6 +809,15 @@ export function QuoteSection() {
                     </p>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {/* Honeypot — hidden from humans, bots fill it */}
+                    <input
+                      type="text"
+                      {...register("website")}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                    />
                       <label className="flex items-start gap-3 cursor-pointer">
                         <input
                           type="checkbox"

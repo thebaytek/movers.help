@@ -24,6 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://movers.help"),
   title: {
     default: "Movers.help — AI-Powered Long Distance Moving",
     template: "%s | Movers.help",

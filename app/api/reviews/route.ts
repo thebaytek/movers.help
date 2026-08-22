@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const reviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
@@ -14,6 +15,16 @@ const reviewSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+
+    // Rate limit: 5 submissions per 10 min per IP
+    const ip = getClientIp(request);
+    const rl = rateLimit(`reviews:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: "Too many requests, please try again later" },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+      );
+    }
     const parsed = reviewSchema.safeParse(body);
 
     if (!parsed.success) {
