@@ -13,7 +13,7 @@
 | `npx tsc --noEmit` | ✅ clean |
 | `npm test` (Vitest) | ✅ 72 tests / 10 files passing |
 | `npm run build` (`next build`) | ✅ succeeds — 11 routes (static: `/`, `/login`, `/signup`, `/scan`, `/_not-found`; dynamic: `/dashboard`, `/api/*`) |
-| Git remote | ✅ `github.com/thebaytek/movers.helpkilo.git` (master ↔ origin/master) |
+| Git remote | ✅ `github.com/thebaytek/movers.help.git` (master ↔ origin/master; renamed from `movers.helpkilo` 2026-08-22) |
 | Supabase | ✅ **remote** project `aoysbhiwbpqqhxyfkkvl.supabase.co` (anon + service-role keys present in `.env.local`) |
 | Resend | ⚠️ `RESEND_API_KEY` present (14 chars, `re_` prefix — verify it's a valid production key, not a test key) |
 | WIP on disk | 🚧 still uncommitted (see "In Progress") |
@@ -26,7 +26,7 @@
 - TypeScript clean — `npx tsc --noEmit` passes
 - Test suite — Vitest + Testing Library, **72 tests passing (10 files)**: scanner-web (label-map, spatial-tracker, volume-calculator, position-estimator, camera, speech), furniture catalog (16), page smoke
 - Production build — `npm run build` clean (11 routes)
-- Git configured with remote (`baytek / admin@thebaytek.com` → `github.com/thebaytek/movers.helpkilo`)
+- Git configured with remote (`baytek / admin@thebaytek.com` → `github.com/thebaytek/movers.help`)
 
 ### Brand & Landing (matrix aesthetic)
 - Full rebrand: black/green matrix look, cyan highlights, no cyan gradients (`47bdc44`)
@@ -81,11 +81,9 @@ Full checklist: **`GO_LIVE.md`** (sibling file). Summary:
 - [ ] **Favicon** — only `public/favicon.svg`; add raster `app/icon.png` (or `.ico`) for social/browser icons
 
 ### Deployment
-- [ ] **No deployment config** — no `vercel.json`, `wrangler.toml`, or OpenNext config. Domain is on Cloudflare → decide target:
-  - **Vercel** (simplest for Next 15; point Cloudflare DNS CNAME to Vercel), or
-  - **Cloudflare Pages/Workers** (requires `@opennextjs/cloudflare` adapter)
-- [ ] **Node 22 runtime** — supabase-js warns Node 20 deprecated; set runtime ≥22 on the host
-- [ ] **Production env vars** — set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` on the host (never commit `.env.local`)
+- [ ] **No deployment config** — no `netlify.toml` yet. **Deploy target: Netlify** (chosen 2026-08-22). Needs `netlify.toml` (`publish = ".next"`, `NODE_VERSION = "22"`) — see `GO_LIVE.md` §9
+- [ ] **Node 22 runtime** — supabase-js warns Node 20 deprecated; set `NODE_VERSION = "22"` on Netlify
+- [ ] **Production env vars** — set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` on Netlify (never commit `.env.local`)
 
 ### Data / auth / security
 - [ ] **Commit the WIP** (furniture catalog + scanner) so it ships

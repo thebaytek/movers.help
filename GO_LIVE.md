@@ -78,21 +78,28 @@ Only `public/favicon.svg` exists (SVG icons work, but social/browser favicons wa
 
 - [ ] `app/icon.png` (512×512) — Next auto-serves as favicon/OG fallback
 
-### 9. Deploy (choose one target)
+### 9. Deploy to Netlify (chosen target — 2026-08-22)
 
-**Option A — Vercel (recommended, fastest for Next 15):**
-- [ ] Push `master` to GitHub
-- [ ] Import repo into Vercel (framework auto-detected)
-- [ ] Set env vars (see §10)
-- [ ] Cloudflare DNS: `movers.help` + `www` → CNAME to Vercel (`cname.vercel-dns.com`), or use Vercel nameservers
-- [ ] Verify HTTPS on `https://movers.help`
+Next.js 15 App Router runs on Netlify's built-in Next.js runtime — no OpenNext adapter needed.
 
-**Option B — Cloudflare Pages/Workers (if staying fully on Cloudflare):**
-- [ ] Add `@opennextjs/cloudflare` + `wrangler` (Next app router requires the OpenNext adapter)
-- [ ] `wrangler.toml` / `open-next.config.ts`
-- [ ] Set env vars + build command (`opennextjs-cloudflare build && opennextjs-cloudflare deploy`)
+- [ ] Add `netlify.toml` at repo root:
+  ```toml
+  [build]
+    command = "npm run build"
+    publish = ".next"
 
-- [ ] **Node ≥22 runtime** on the host (supabase-js deprecates Node 20)
+  [build.environment]
+    NODE_VERSION = "22"
+  ```
+- [ ] Commit + push `netlify.toml`
+- [ ] Netlify → Add new site → Import from Git (`github.com/thebaytek/movers.help` — private; grant the Netlify GitHub app repo access)
+- [ ] Framework auto-detected (Next.js); confirm build command `npm run build`, publish dir `.next`
+- [ ] Set env vars (see §10) — Site settings → Environment variables
+- [ ] Custom domain: Domain management → add `movers.help` + `www.movers.help`
+  - Either move DNS to Netlify (swap Cloudflare nameservers), **or**
+  - Keep Cloudflare: CNAME `www` → `<site>.netlify.app`; apex via Cloudflare CNAME-flattening → `<site>.netlify.app`
+- [ ] **Node ≥22** (`NODE_VERSION = "22"` above — supabase-js deprecates Node 20)
+- [ ] Verify HTTPS + www→apex redirect on `https://movers.help`
 
 ### 10. Production environment variables
 Set on the host (never commit `.env.local`):
