@@ -1,12 +1,31 @@
 # Movers.help — Project Status
 
-**Updated:** 2026-08-20 (re-verified: tsc, tests, build, git, env)
+**Updated:** 2026-08-22 (go-live fix session; final `tsc` + build + smoke gate re-run at deploy)
 **Repo:** `/home/hunter/movers.help` (Next.js 15.5.20 / React 19 / Tailwind 4 / Supabase / Vitest) — formerly `movers.helpkilo`
 **Legacy repo:** `/home/hunter/movers.helpalpha` (Next.js 14 — old landing + Expo mobile app + original scanner-web module) — formerly `movers.help`. Superseded except `apps/mobile/` (Expo) and `lib/scanner-web/` history.
 
 ---
 
-## 🔍 VERIFIED THIS SESSION (2026-08-20)
+## ✅ FIXED THIS SESSION (2026-08-22)
+
+Go-live P0/defect fixes landed (see `GO_LIVE.md` for the full checklist). Final `tsc` + build + smoke gate re-run at deploy.
+
+- **SEO / metadata**: `metadataBase` set in `app/layout.tsx` → OG warning gone
+- **Assets**: `public/og-image.png` (1200×630) + `app/icon.png` (512×512) generated
+- **Crawl**: `app/robots.ts` + `app/sitemap.ts` added (serving verified)
+- **Env validation**: `lib/env.ts` zod schema — Supabase 3 vars hard-required; `RESEND_API_KEY` optional/placeholder-skip
+- **Spam protection**: honeypot + rate limit on `/api/leads`, rate limit on `/api/reviews`
+- **Deploy**: `netlify.toml` added (target Netlify, `NODE_VERSION = "22"`, `publish = ".next"`)
+- **Migration**: `20260822000000_reviews_anon_insert.sql` (reviews anon-insert RLS fix) — **still must be APPLIED to remote Supabase**
+- **API**: `/api/reviews` POST attaches `customer_id` when a session exists; `/api/leads` PATCH now requires auth (401 anon / 403 customer / mover via RLS / admin via service-role)
+- **Signup**: mover role gated on a valid invite code (expiry + atomic redeem); no unconditional `role:mover`
+- **Dashboard**: removed dead `/dashboard/leads` nav link; added `/dashboard/settings` page + copy button
+- **Landing**: removed fabricated claims (50,000+ scans, 1,200+ movers, 4.9 rating, 10,000+ scans, 94% accuracy, 1200 reviews, "no fakes")
+- **Housekeeping**: `package.json` renamed to `movers.help`; removed drizzle-kit scripts; deleted `drizzle.config.ts`
+
+---
+
+## 🔍 LAST FULL GATE (2026-08-20)
 
 | Check | Result |
 |---|---|
@@ -27,6 +46,9 @@
 - Test suite — Vitest + Testing Library, **72 tests passing (10 files)**: scanner-web (label-map, spatial-tracker, volume-calculator, position-estimator, camera, speech), furniture catalog (16), page smoke
 - Production build — `npm run build` clean (11 routes)
 - Git configured with remote (`baytek / admin@thebaytek.com` → `github.com/thebaytek/movers.help`)
+- `lib/env.ts` zod env validation — Supabase 3 vars hard-required; `RESEND_API_KEY` optional/placeholder-skip
+- `netlify.toml` added (target Netlify, `NODE_VERSION = "22"`, `publish = ".next"`)
+- `package.json` renamed to `movers.help`; drizzle-kit scripts removed; `drizzle.config.ts` deleted
 
 ### Brand & Landing (matrix aesthetic)
 - Full rebrand: black/green matrix look, cyan highlights, no cyan gradients (`47bdc44`)
@@ -34,17 +56,20 @@
 - Landing sections: hero, about, how-it-works, trust-signals, reviews, quote-section, scanner-demo, truck-viewer, final-cta, matrix-rain
 - `brandkit.html` at repo root; `components/brand/` logo variants
 - `error.tsx`, `loading.tsx`, `not-found.tsx` route files exist
-- Metadata: `title`/`description`/`keywords`/`openGraph`/`twitter`/`robots` present in `app/layout.tsx` — **but `metadataBase` is missing** (see blockers)
+- Metadata: `title`/`description`/`keywords`/`openGraph`/`twitter`/`robots` + `metadataBase: new URL("https://movers.help")` in `app/layout.tsx` (OG warning fixed 2026-08-22)
+- `public/og-image.png` (1200×630) + `app/icon.png` (512×512) generated; `app/robots.ts` + `app/sitemap.ts` added
+- Honest trust copy — fabricated claims removed (50,000+ scans, 1,200+ movers, 4.9 rating, 10,000+ scans, 94% accuracy, 1200 reviews, "no fakes")
 
 ### Auth & Data
-- Signup flow (`app/(auth)/signup/actions.ts`) — email/password + invite-code check → `profiles`, redirects to `/dashboard`
+- Signup flow (`app/(auth)/signup/actions.ts`) — email/password + **mover role gated on a valid invite code** (expiry + atomic redeem; no unconditional `role:mover`) → `profiles`, redirects to `/dashboard`
 - Login flow (`app/(auth)/login/`) — renders 200
 - NextAuth scaffolding — `app/api/auth/[...nextauth]/` + callback (routes only, providers unwired)
 - **Remote Supabase project configured** (`aoysbhiwbpqqhxyfkkvl.supabase.co`) — anon key + service-role key in `.env.local`
 - Migrations in `supabase/migrations/`:
   - `20260709223924_initial_schema.sql` (leads, reviews, pricing_rules, inventory_items, profiles)
   - `20260710000000_init.sql`, `20260711000001_furniture_catalog.sql`
-  - `20260814000001_furniture_catalog_accurate.sql` — **uncommitted**
+  - `20260814000001_furniture_catalog_accurate.sql` — committed (`8d2e32e`)
+  - `20260822000000_reviews_anon_insert.sql` — **new this session** (reviews anon-insert RLS fix); uncommitted + must be applied to remote
 - ⚠️ **Whether migrations are applied to the remote project is UNVERIFIED** — must confirm via Supabase dashboard or `supabase db push` before go-live
 
 ### Scanner (web) — `app/scan/` + `lib/scanner-web/`
@@ -55,46 +80,43 @@
 - Scanner fixes: black-screen fix (h-dvh→h-screen), loading timeout, StrictMode guard
 
 ### API
-- `/api/leads` — POST (create lead + inventory + resend email notification) + PATCH (status/mover/notes)
-- `/api/reviews` — POST (submit) + GET (list, `verified` filter, limit)
+- `/api/leads` — POST (create lead + inventory + resend email notification; honeypot + rate limit) + PATCH (status/mover/notes; **auth required**: 401 anon / 403 customer / mover via RLS / admin via service-role)
+- `/api/reviews` — POST (submit; attaches `customer_id` when a session exists; rate-limited) + GET (list, `verified` filter, limit)
 - `/api/auth/callback`, `/api/auth/[...nextauth]`
+
+### Dashboard
+- Removed dead `/dashboard/leads` nav link; added `/dashboard/settings` page + invite-code copy button
 
 ---
 
 ## 🚧 IN PROGRESS (uncommitted WIP on disk)
 
 From `git status` — needs review + commit **before deploy**:
-- `lib/furniture.ts` — canonical furniture size table (packed dims in inches → derived cu ft). **New, untracked** + `lib/__tests__/furniture.test.ts` (16 tests)
-- `supabase/migrations/20260814000001_furniture_catalog_accurate.sql` — **untracked**
-- Modified: `app/scan/page.tsx`, `lib/inventory.ts`, `lib/scanner-web/` (camera.ts, speech.ts, inventory-state.ts, spatial-tracker.ts, geometry/volume-calculator.ts) + new tests `camera.test.ts`, `speech.test.ts`
+- Furniture/scanner WIP **committed** (`8d2e32e`) — no longer untracked
+- **Go-live fixes (2026-08-22, uncommitted)** — modified `app/(auth)/signup/actions.ts`, `app/api/leads/route.ts`, `app/api/reviews/route.ts`, `app/(dashboard)/layout.tsx`, `components/landing/{about,final-cta,hero,reviews,trust-signals}.tsx`, `package.json`
+- **New (untracked)** — `app/(dashboard)/dashboard/settings/` (page + copy button), `netlify.toml`, `supabase/migrations/20260822000000_reviews_anon_insert.sql`
+- **Deleted** — `drizzle.config.ts`
 
 ---
 
-## 🚨 GO-LIVE BLOCKERS (must fix before `movers.help` is live)
+## 🚨 GO-LIVE BLOCKERS (remaining — must fix before `movers.help` is live)
 
-Full checklist: **`GO_LIVE.md`** (sibling file). Summary:
+Full checklist: **`GO_LIVE.md`** (sibling file). Summary of what is still open:
 
-### SEO / metadata
-- [ ] **`metadataBase` not set** — build warns OG/Twitter resolve to `http://localhost:3000`. Add `metadataBase: new URL("https://movers.help")` in `app/layout.tsx`
-- [ ] **`og-image.png` referenced but missing** — `openGraph.images[0].url = "/og-image.png"`; `public/` has no such file. Generate 1200×630
-- [ ] **No `robots.ts` / `sitemap.ts`** — add `app/robots.ts` + `app/sitemap.ts`
-- [ ] **Favicon** — only `public/favicon.svg`; add raster `app/icon.png` (or `.ico`) for social/browser icons
-
-### Deployment
-- [ ] **No deployment config** — no `netlify.toml` yet. **Deploy target: Netlify** (chosen 2026-08-22). Needs `netlify.toml` (`publish = ".next"`, `NODE_VERSION = "22"`) — see `GO_LIVE.md` §9
-- [ ] **Node 22 runtime** — supabase-js warns Node 20 deprecated; set `NODE_VERSION = "22"` on Netlify
-- [ ] **Production env vars** — set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` on Netlify (never commit `.env.local`)
+### Deployment / environment
+- [ ] **Commit the WIP** (furniture catalog + scanner + this session's fixes) so it ships
+- [ ] **Confirm migrations applied to remote Supabase** (`aoysbhiwbpqqhxyfkkvl`) — incl. new `20260822000000_reviews_anon_insert.sql`
+- [ ] **Production env vars on Netlify** — set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` (never commit `.env.local`)
+- [ ] **Netlify site + Cloudflare DNS** — import repo into Netlify, add custom domain + DNS (CNAME `www` → `<site>.netlify.app`; apex CNAME-flattening)
+- [ ] **Node 22 runtime** — `NODE_VERSION = "22"` is now in `netlify.toml`; confirm the host honors it
 
 ### Data / auth / security
-- [ ] **Commit the WIP** (furniture catalog + scanner) so it ships
-- [ ] **Confirm migrations applied to remote Supabase** (`aoysbhiwbpqqhxyfkkvl`)
+- [ ] **Supabase Auth enable + URLs** — Email provider on; Site URL + redirect URLs → `https://movers.help`
 - [ ] **RLS policies tested** — leads/inventory/reviews/profiles policies defined in schema but untested with authenticated roles (anon submit vs mover read vs admin)
-- [ ] **Resend domain verification** — verify `movers.help` in Resend, confirm `notifications@movers.help` sender + valid API key
-- [ ] **Spam protection** — quote + review forms are public with no CAPTCHA/honeypot/rate-limit
-- [ ] **Env validation** — no zod env schema; fail-fast on missing keys (`@t3-oss/env-nextjs` pattern)
+- [ ] **Resend real key + domain** — verify `movers.help` in Resend, confirm `notifications@movers.help` sender + valid production API key (current local key is a test key)
 
-### Content / legal
-- [ ] **Hardcoded trust numbers + fake testimonials** — replace "50,000+ Moves" / placeholder reviews with honest framing (FTC risk)
+### Content
+- [ ] **Real testimonials/reviews** — placeholder testimonials still need real, verifiable quotes (FTC-safe)
 
 ---
 

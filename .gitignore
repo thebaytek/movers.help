@@ -46,3 +46,7 @@ sqlite.db-journal
 # ide
 .idea
 .vscode/settings.json
+
+# worktrees / tool scratch
+.worktrees/
+.superpowers/

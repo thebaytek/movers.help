@@ -10,7 +10,7 @@ const benefits = [
     icon: Zap,
     title: "AI Room Scanning",
     description:
-      "Our computer vision model has been tested on 50,000+ room scans across 1,200+ real moves. It detects furniture and calculates volume automatically.",
+      "It detects furniture from a live camera scan and calculates volume automatically. No manual inventory lists, no tape measure.",
   },
   {
     icon: ReceiptText,

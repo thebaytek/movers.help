@@ -106,9 +106,9 @@ export function Reviews() {
 
   const avgRating = reviews.length
     ? Math.round((reviews.reduce((a, r) => a + r.rating, 0) / reviews.length) * 10) / 10
-    : 4.9;
+    : 0;
 
-  const totalReviews = reviews.length || 1200;
+  const totalReviews = reviews.length;
 
   useEffect(() => {
     async function fetchReviews() {
@@ -197,16 +197,16 @@ export function Reviews() {
             <span className="gradient-text">What Our Customers Say</span>
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-surface-400 text-balance">
-            Real reviews from real moves. No fakes, no paid testimonials.
+            Here&apos;s what early customers are saying.
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-3">
-            <StarRating rating={5} />
+            <StarRating rating={Math.round(avgRating)} />
             <span className="text-lg font-bold text-surface-100 font-display">
               {avgRating} out of 5
             </span>
             <span className="text-sm text-surface-400">
-              from {totalReviews.toLocaleString()}+ verified reviews
+              from {totalReviews.toLocaleString()} reviews
             </span>
           </div>
         </div>

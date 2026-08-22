@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Star } from "lucide-react";
 
 function MagneticButton({
   children,
@@ -93,12 +92,9 @@ export function FinalCTA() {
           </MagneticButton>
 
           <div className="relative mt-6 flex items-center justify-center gap-5 text-sm text-surface-400">
-            <span className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="font-semibold text-surface-200">4.9</span>
-            </span>
+            <span>AI-powered volume scanning</span>
             <span className="w-1 h-1 rounded-full bg-surface-700" />
-            <span>1,200+ happy movers</span>
+            <span>Transparent, itemized pricing</span>
             <span className="w-1 h-1 rounded-full bg-surface-700" />
             <span>Free, instant estimates</span>
           </div>

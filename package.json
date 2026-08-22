@@ -1,5 +1,5 @@
 {
-  "name": "movers-helpkilo",
+  "name": "movers.help",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -8,11 +8,7 @@
     "start": "next start",
     "test": "vitest run",
     "lint": "next lint",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
     "db:seed": "tsx lib/db/seed.ts",
-    "db:studio": "drizzle-kit studio",
     "kill": "pkill -f 'next dev' 2>/dev/null; pkill -f 'next-server' 2>/dev/null; echo 'dev server stopped'"
   },
   "dependencies": {

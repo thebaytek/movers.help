@@ -10,7 +10,7 @@ const pillars = [
     icon: Brain,
     title: "AI That Actually Works",
     description:
-      "Our object detection model is trained on 10,000+ room scans. It identifies furniture with 94% accuracy, calculating cubic footage in real time. No manual inventory forms.",
+      "It identifies furniture from a live camera scan and calculates cubic footage in real time. No manual inventory forms.",
   },
   {
     icon: ShieldCheck,

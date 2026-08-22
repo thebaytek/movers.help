@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -14,25 +14,28 @@ export async function signup(formData: FormData) {
   const phone = formData.get("phone") as string;
   const inviteCode = formData.get("inviteCode") as string;
 
+  // Invite codes sit behind RLS (anonymous reads are blocked), so validate and
+  // redeem via the service-role client. This runs server-side only.
+  let isMover = false;
   if (inviteCode) {
-    const { data: invite } = await supabase
+    const admin = await createAdminClient();
+    const { data: invite } = await admin
       .from("invite_codes")
       .select("*")
       .eq("code", inviteCode)
       .is("used_by", null)
       .single();
 
-    if (!invite) {
+    if (!invite || (invite.expires_at && new Date(invite.expires_at) < new Date())) {
       return { error: "Invalid or expired invite code" };
     }
+    isMover = true;
   }
 
   const { error, data } = await supabase.auth.signUp({
     email,
     password,
-    options: {
-      data: { full_name: fullName },
-    },
+    options: { data: { full_name: fullName } },
   });
 
   if (error) {
@@ -40,24 +43,37 @@ export async function signup(formData: FormData) {
   }
 
   if (data.user) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = supabase as any;
-    await db
+    const admin = await createAdminClient();
+
+    // Redeem atomically BEFORE granting the mover role (race-safe).
+    if (isMover && inviteCode) {
+      const { data: redeemed, error: redeemError } = await admin
+        .from("invite_codes")
+        .update({ used_by: data.user.id, used_at: new Date().toISOString() })
+        .eq("code", inviteCode)
+        .is("used_by", null)
+        .select()
+        .single();
+
+      if (redeemError || !redeemed) {
+        // Lost a race on the code — the account stays a customer.
+        await admin
+          .from("profiles")
+          .update({ full_name: fullName, company_name: companyName, phone })
+          .eq("id", data.user.id);
+        return { error: "Invite code already in use" };
+      }
+    }
+
+    await admin
       .from("profiles")
       .update({
         full_name: fullName,
         company_name: companyName,
         phone,
-        role: "mover",
+        ...(isMover ? { role: "mover" } : {}),
       })
       .eq("id", data.user.id);
-
-    if (inviteCode) {
-      await db
-        .from("invite_codes")
-        .update({ used_by: data.user.id, used_at: new Date().toISOString() })
-        .eq("code", inviteCode);
-    }
   }
 
   revalidatePath("/", "layout");

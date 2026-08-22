@@ -3,13 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, FileText, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Settings, LogOut, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { SignOutButton } from "./signout-button";
 
 const sidebarLinks = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Leads", href: "/dashboard/leads", icon: FileText },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

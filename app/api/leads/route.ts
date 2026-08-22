@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { sendLeadNotification } from "@/lib/email";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import type { Database } from "@/types/supabase";
 
 const leadSchema = z.object({
   moveFromCity: z.string().min(1),
@@ -53,8 +54,7 @@ export async function POST(request: Request) {
 
     const data = parsed.data;
     const supabase = await createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = supabase as any;
+    const db = supabase;
 
     // Create the lead
     const { data: lead, error: leadError } = await db
@@ -138,15 +138,37 @@ export async function PATCH(request: Request) {
     }
 
     const { leadId, ...updates } = parsed.data;
+
+    // Authz: session required
     const supabase = await createClient();
-    const db = supabase as any;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Resolve role
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    const role = profile?.role;
+
+    if (role !== "mover" && role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Map camelCase to snake_case for DB
-    const dbUpdates: Record<string, unknown> = {};
+    const dbUpdates: Database["public"]["Tables"]["leads"]["Update"] = {
+      updated_at: new Date().toISOString(),
+    };
     if (updates.status !== undefined) dbUpdates.status = updates.status;
-    if (updates.moverId !== undefined) dbUpdates.mover_id = updates.moverId;
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
-    dbUpdates.updated_at = new Date().toISOString();
+    // Only admins may reassign a lead
+    if (role === "admin" && updates.moverId !== undefined) dbUpdates.mover_id = updates.moverId;
+
+    // Admin: service-role bypasses RLS. Mover: anon client, RLS restricts to assigned leads.
+    const db = role === "admin" ? await createAdminClient() : supabase;
 
     const { data: lead, error } = await db
       .from("leads")
@@ -156,8 +178,11 @@ export async function PATCH(request: Request) {
       .single();
 
     if (error || !lead) {
-      console.error("Failed to update lead:", error);
-      return NextResponse.json({ error: "Failed to update lead" }, { status: 500 });
+      // A mover touching a non-assigned lead is blocked by RLS → 403, not 500
+      return NextResponse.json(
+        { error: role === "mover" ? "Forbidden" : "Failed to update lead" },
+        { status: role === "mover" ? 403 : 500 }
+      );
     }
 
     return NextResponse.json({ success: true, lead }, { status: 200 });

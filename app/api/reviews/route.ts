@@ -38,6 +38,7 @@ export async function POST(request: Request) {
     const supabase = await createClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const db = supabase as any;
+    const { data: { user } } = await supabase.auth.getUser();
 
     const { data: review, error } = await db
       .from("reviews")
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
         move_from_city: data.moveFromCity || null,
         move_to_city: data.moveToCity || null,
         is_verified: false,
+        ...(user ? { customer_id: user.id } : {}),
       })
       .select()
       .single();
@@ -68,7 +70,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const verified = searchParams.get("verified") === "true";
+    const verified = searchParams.get("verified") !== "false";
     const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10), 50);
 
     const supabase = await createClient();

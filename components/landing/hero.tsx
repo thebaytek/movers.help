@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { ArrowRight, Play, Star } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
@@ -13,8 +13,8 @@ const subheadline =
   "No hidden fees. No bait-and-switch. Just honest long-distance moving powered by AI that sees your stuff before the truck arrives.";
 
 const trustItems = [
-  { label: "Verified by 1,200+ happy movers" },
-  { label: "4.9 avg rating", stars: 5 },
+  { label: "AI-powered volume scanning" },
+  { label: "Transparent, itemized pricing" },
   { label: "Free, no-obligation quotes" },
 ];
 
@@ -279,13 +279,6 @@ export function Hero() {
         >
           {trustItems.map((item, i) => (
             <div key={item.label} className="flex items-center gap-1.5">
-              {item.stars &&
-                Array.from({ length: item.stars }).map((_, si) => (
-                  <Star
-                    key={si}
-                    className="h-4 w-4 fill-amber-400 text-amber-400"
-                  />
-                ))}
               <span>{item.label}</span>
               {i < trustItems.length - 1 && (
                 <span className="hidden sm:inline text-surface-700 mx-2">
