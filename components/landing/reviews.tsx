@@ -24,42 +24,6 @@ interface Review {
   created_at: string;
 }
 
-const FALLBACK_REVIEWS: Review[] = [
-  {
-    id: "fallback-1",
-    rating: 5,
-    title: "Made our cross-country move stress-free",
-    body: "From the AI scan to the final delivery, everything was transparent and on-budget. The 3D truck view showed us exactly how our stuff would fit. No surprises, no hidden fees — exactly what they promised.",
-    customer_name: "Sarah Mitchell",
-    move_from_city: "Austin",
-    move_to_city: "Denver",
-    is_verified: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "fallback-2",
-    rating: 5,
-    title: "Finally, honest moving pricing",
-    body: "I got 4 quotes from other companies and they were all over the place. Movers.help gave me one price based on my actual inventory scan and it was dead-on. The movers showed up on time and the final bill matched the quote.",
-    customer_name: "James Rodriguez",
-    move_from_city: "San Diego",
-    move_to_city: "Portland",
-    is_verified: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "fallback-3",
-    rating: 5,
-    title: "The scanner is a game changer",
-    body: "I walked through my apartment with my phone and it automatically detected my furniture. Took 5 minutes. The quote was accurate to within $200 of the final price.",
-    customer_name: "Maria Chen",
-    move_from_city: "Chicago",
-    move_to_city: "Nashville",
-    is_verified: true,
-    created_at: new Date().toISOString(),
-  },
-];
-
 const slideVariants = {
   enter: (direction: number) => ({
     x: direction > 0 ? 200 : -200,
@@ -123,12 +87,10 @@ export function Reviews() {
 
         if (!error && data && data.length > 0) {
           setReviews(data as Review[]);
-          return;
         }
       } catch {
-        // fall through to fallback
+        // leave reviews empty on error — never fabricate testimonials
       }
-      setReviews(FALLBACK_REVIEWS);
     }
     fetchReviews();
   }, []);
