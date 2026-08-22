@@ -170,16 +170,5 @@ create index idx_inventory_lead on public.inventory_items(lead_id);
 create index idx_reviews_verified on public.reviews(is_verified) where is_verified = true;
 create index idx_reviews_mover on public.reviews(mover_id);
 
--- ============================================
--- Seed data: verified reviews
--- ============================================
-insert into public.reviews (id, rating, title, body, customer_name, move_from_city, move_to_city, is_verified) values
-  (uuid_generate_v4(), 5, 'Made our cross-country move stress-free', 'From the AI scan to the final delivery, everything was transparent and on-budget. The 3D truck view showed us exactly how our stuff would fit. No surprises, no hidden fees — exactly what they promised.', 'Sarah Mitchell', 'Austin', 'Denver', true),
-  (uuid_generate_v4(), 5, 'Finally, honest moving pricing', 'I got 4 quotes from other companies and they were all over the place. Movers.help gave me one price based on my actual inventory scan and it was dead-on. The movers showed up on time and the final bill matched the quote.', 'James Rodriguez', 'San Diego', 'Portland', true),
-  (uuid_generate_v4(), 5, 'The scanner is a game changer', 'I walked through my apartment with my phone and it automatically detected my furniture. Took 5 minutes. The quote was accurate to within $200 of the final price.', 'Maria Chen', 'Chicago', 'Nashville', true),
-  (uuid_generate_v4(), 4, 'Great experience, minor scheduling hiccup', 'The pricing was fair and the team was professional. We had a one-day delay on pickup due to weather, but they communicated clearly. Would use again.', 'David Park', 'Seattle', 'Phoenix', true),
-  (uuid_generate_v4(), 5, 'Best moving experience in 20 years', 'I have moved 8 times in my career. This was the first time the final price was within 3% of the quote. The AI inventory scanner eliminates the guesswork.', 'Linda Thompson', 'Miami', 'Atlanta', true),
-  (uuid_generate_v4(), 5, 'Perfect for our office relocation', 'We moved our 20-person office and the scanner handled desks, chairs, servers — everything. The truck visualization helped us choose the right truck size.', 'Michael Torres', 'New York', 'Charlotte', true);
-
 insert into public.pricing_rules (id, name, base_rate_per_cu_ft, rate_per_mile, minimum_price, labor_rate_per_hour, seasonal_multiplier_summer, seasonal_multiplier_winter, accessibility_fee, active) values
   (uuid_generate_v4(), 'Standard Long-Distance', 5.50, 0.65, 500, 65, 1.25, 0.85, 150, true);
