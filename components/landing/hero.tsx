@@ -1,296 +1,148 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/brand/logo";
-import { cn } from "@/lib/utils";
 
-const headline = "AI Scans Your Home. You Get the Real Price.";
+const headline = "AI inventory scanning built for movers.";
 
 const subheadline =
-  "No hidden fees. No bait-and-switch. Just honest long-distance moving powered by AI that sees your stuff before the truck arrives.";
+  "Turn a customer’s phone camera into a calibrated, reviewable furniture inventory your sales team can trust.";
 
-const trustItems = [
-  { label: "AI-powered volume scanning" },
-  { label: "Transparent, itemized pricing" },
-  { label: "Free, no-obligation quotes" },
-];
-
-function MagneticButton({
-  children,
-  className,
-  ...props
-}: React.ComponentProps<typeof Button> & {
-  children: React.ReactNode;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 180, damping: 16 });
-  const springY = useSpring(y, { stiffness: 180, damping: 16 });
-
-  function handleMouseMove(e: React.MouseEvent) {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const dx = e.clientX - (rect.left + rect.width / 2);
-    const dy = e.clientY - (rect.top + rect.height / 2);
-    x.set(dx * 0.35);
-    y.set(dy * 0.35);
-  }
-
-  function handleMouseLeave() {
-    x.set(0);
-    y.set(0);
-  }
-
+/** Inline product visual — scanner HUD plane for the first viewport */
+function HeroScannerPlane() {
   return (
-    <motion.div
-      ref={ref}
-      style={{ x: springX, y: springY }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={cn("inline-block", className)}
+    <div
+      className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-xl border border-white/10 bg-surface-900"
+      aria-hidden="true"
     >
-      <Button {...props}>{children}</Button>
-    </motion.div>
-  );
-}
+      <div className="aspect-[21/9] w-full sm:aspect-[2.4/1]">
+        {/* Warm room plane */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(165deg, #2a2a3a 0%, #1a1a28 42%, #12121c 100%)",
+          }}
+        />
+        <div className="absolute inset-x-0 top-[58%] bottom-0 bg-gradient-to-b from-[#2e2e3f] to-[#14141e]" />
+        <div className="absolute inset-x-0 top-[56%] h-px bg-white/10" />
 
-function ScrollIndicator() {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 2.2, duration: 0.6 }}
-      className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-    >
-      <div className="flex flex-col items-center gap-1">
-        <svg
-          width="24"
-          height="36"
-          viewBox="0 0 24 36"
-          fill="none"
-          className="text-surface-500"
-        >
-          <rect
-            x="0.75"
-            y="0.75"
-            width="22.5"
-            height="34.5"
-            rx="11.25"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <motion.rect
-            x="10.5"
-            y="7"
-            width="3"
-            height="8"
-            rx="1.5"
-            fill="currentColor"
-            animate={{ y: [7, 14, 7], opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </svg>
+        {/* Soft window light — no blur orbs */}
+        <div
+          className="absolute left-[12%] top-[10%] h-[36%] w-[22%] rounded-sm border border-white/10"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(160,180,210,0.28), rgba(160,180,210,0.08))",
+          }}
+        />
+
+        {/* Furniture blocks */}
+        <div className="absolute left-[18%] top-[42%] h-[28%] w-[34%] rounded-sm bg-[#6b7280]/55" />
+        <div className="absolute left-[56%] top-[48%] h-[18%] w-[14%] rounded-sm bg-[#78716c]/45" />
+        <div className="absolute left-[72%] top-[40%] h-[26%] w-[12%] rounded-sm bg-[#64748b]/40" />
+
+        {/* Live HUD boxes */}
+        <div className="absolute left-[17%] top-[40%] h-[32%] w-[36%] border border-[#76ff03]/70">
+          <span className="absolute -top-5 left-0 bg-[#76ff03] px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#08080e]">
+            Sofa (3-seater) · 58 ft³ · 97%
+          </span>
+          <div className="absolute -left-px -top-px h-2.5 w-2.5 border-l-2 border-t-2 border-[#76ff03]" />
+          <div className="absolute -right-px -top-px h-2.5 w-2.5 border-r-2 border-t-2 border-[#76ff03]" />
+          <div className="absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-[#76ff03]" />
+          <div className="absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-[#76ff03]" />
+        </div>
+        <div className="absolute left-[55%] top-[46%] h-[22%] w-[16%] border border-[#76ff03]/55">
+          <span className="absolute -top-5 left-0 whitespace-nowrap bg-[#76ff03]/90 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#08080e]">
+            Dining Chair · 7 ft³
+          </span>
+        </div>
+
+        {/* Scan line */}
+        <div className="absolute inset-x-0 top-[38%] h-px bg-gradient-to-r from-transparent via-[#76ff03] to-transparent opacity-80" />
+
+        {/* Bottom strip */}
+        <div className="absolute inset-x-4 bottom-3 flex items-center justify-between rounded-lg border border-white/10 bg-surface-950/80 px-3 py-2 sm:inset-x-6">
+          <span className="text-[11px] text-surface-400">Living Room · calibrated</span>
+          <span className="font-mono text-xs font-semibold tabular-nums text-[#76ff03]">
+            4 items · 92 cu ft
+          </span>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
-
-function FloatingOrb({
-  className,
-  colorClass,
-  size = 600,
-  delay = 0,
-  duration = 8,
-  xOffset,
-  yOffset,
-}: {
-  className?: string;
-  colorClass: string;
-  size?: number;
-  delay?: number;
-  duration?: number;
-  xOffset?: string;
-  yOffset?: string;
-}) {
-  return (
-    <motion.div
-      className={cn(
-        "absolute rounded-full blur-[120px]",
-        colorClass,
-        className
-      )}
-      style={{
-        width: size,
-        height: size,
-        ...(xOffset && yOffset
-          ? { left: xOffset, top: yOffset }
-          : {}),
-      }}
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{
-        opacity: [0.35, 0.55, 0.35],
-        scale: [0.9, 1.1, 0.9],
-      }}
-      transition={{
-        opacity: { duration, delay, repeat: Infinity, ease: "easeInOut" },
-        scale: {
-          duration: duration * 1.2,
-          delay,
-          repeat: Infinity,
-          ease: "easeInOut",
-        },
-      }}
-    />
-  );
-}
-
-const wordVariants = {
-  hidden: { opacity: 0, y: 24, filter: "blur(8px)" },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: {
-      duration: 0.55,
-      delay: 0.7 + i * 0.06,
-      ease: [0.32, 0.72, 0, 1],
-    },
-  }),
-};
 
 export function Hero() {
-  function scrollToHow() {
+  function scrollToDemo() {
     document
-      .getElementById("how-it-works")
+      .getElementById("see-it-in-action")
       ?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0" />
-
-      <FloatingOrb
-        className="top-[-10%] right-[-15%]"
-        colorClass="bg-accent-500/15"
-        size={700}
-        duration={9}
-      />
-      <FloatingOrb
-        className="bottom-[-15%] left-[-12%]"
-        colorClass="bg-accent-500/12"
-        size={550}
-        delay={1.5}
-        duration={10}
-        xOffset="10%"
-        yOffset="60%"
-      />
-      <FloatingOrb
-        className="top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2"
-        colorClass="bg-accent-500/6"
-        size={400}
-        delay={3}
-        duration={11}
-      />
-
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 lg:px-8 py-24 sm:py-32">
-        <motion.div
-          initial={{ opacity: 0, filter: "blur(12px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.32, 0.72, 0, 1] }}
-          className="flex justify-center mb-10"
-        >
-          <Logo />
-        </motion.div>
-
-        {/* Eyebrow badge */}
-        <motion.div
+    <section className="relative flex min-h-screen flex-col justify-center overflow-hidden pt-28 pb-16 sm:pt-32 sm:pb-20">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 lg:px-8">
+        <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.32, 0.72, 0, 1] }}
-          className="flex justify-center mb-6"
+          transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+          className="text-center font-display text-4xl font-bold tracking-tight text-surface-50 sm:text-5xl md:text-6xl lg:text-7xl"
         >
-          <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-accent-500 bg-accent-500/[0.06] border border-accent-500/[0.12]">
-            AI-Powered Long Distance Moving
-          </span>
-        </motion.div>
+          movers<span className="text-[#76ff03]">.</span>help
+        </motion.p>
 
-        <h1 className="mx-auto max-w-5xl text-center font-display text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl gradient-text text-balance leading-[1.1]">
-          {headline.split(" ").map((word, i) => (
-            <motion.span
-              key={i}
-              className="inline-block"
-              variants={wordVariants}
-              initial="hidden"
-              animate="visible"
-              custom={i}
-            >
-              {word}
-              {i < headline.split(" ").length - 1 ? " " : ""}
-            </motion.span>
-          ))}
-        </h1>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.12, ease: [0.32, 0.72, 0, 1] }}
+          className="mx-auto mt-6 max-w-3xl text-balance text-center font-display text-xl font-semibold leading-snug tracking-tight text-surface-200 sm:text-2xl md:text-3xl"
+        >
+          {headline}
+        </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{
-            duration: 0.7,
-            delay: 1.5,
-            ease: [0.32, 0.72, 0, 1],
-          }}
-          className="mx-auto mt-8 max-w-3xl text-center text-base sm:text-lg md:text-xl text-surface-400 text-balance leading-relaxed"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          className="mx-auto mt-5 max-w-2xl text-balance text-center text-base leading-relaxed text-surface-400 sm:text-lg"
         >
           {subheadline}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{
-            duration: 0.7,
-            delay: 1.75,
-            ease: [0.32, 0.72, 0, 1],
-          }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.32, ease: [0.32, 0.72, 0, 1] }}
+          className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <MagneticButton variant="accent" size="xl">
-            Get Your Quote
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </MagneticButton>
-          <Button variant="ghost" size="xl" onClick={scrollToHow}>
-            <Play className="mr-2 h-5 w-5" />
-            See How It Works
+          <Button asChild size="lg" className="min-h-12 rounded-xl px-7">
+            <Link href="/scan">
+              Try the scanner
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="lg"
+            className="min-h-12 rounded-xl"
+            onClick={scrollToDemo}
+          >
+            <Play className="mr-2 h-4 w-4" />
+            See it in action
           </Button>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{
-            duration: 0.7,
-            delay: 2.0,
-            ease: [0.32, 0.72, 0, 1],
-          }}
-          className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-surface-400"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.45, ease: [0.32, 0.72, 0, 1] }}
+          className="mt-12 sm:mt-14"
         >
-          {trustItems.map((item, i) => (
-            <div key={item.label} className="flex items-center gap-1.5">
-              <span>{item.label}</span>
-              {i < trustItems.length - 1 && (
-                <span className="hidden sm:inline text-surface-700 mx-2">
-                  |
-                </span>
-              )}
-            </div>
-          ))}
+          <HeroScannerPlane />
         </motion.div>
       </div>
-
-      <ScrollIndicator />
     </section>
   );
 }

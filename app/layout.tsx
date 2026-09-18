@@ -84,9 +84,9 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.getItem('theme');
-                  var dark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (dark) document.documentElement.classList.add('dark');
+                  /* Dark-only marketing surface */
+                  document.documentElement.classList.add('dark');
+                  localStorage.setItem('theme', 'dark');
                 } catch(e) {}
               })();
             `,
@@ -99,20 +99,8 @@ export default function RootLayout({
       <body
         className={`${jakarta.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
-        {/* Matrix rain background — covers entire site */}
+        {/* Matrix rain — leave untouched per product direction */}
         <MatrixRain />
-        {/* Persistent green grid overlay — covers entire site */}
-        <div className="fixed inset-0 z-0 pointer-events-none bg-grid scan-line-overlay" aria-hidden="true" />
-        {/* Subtle green ambient glow behind content */}
-        <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true"
-          style={{
-            background: `
-              radial-gradient(ellipse 80% 60% at 50% -10%, rgba(118,255,3,0.04) 0%, transparent 70%),
-              radial-gradient(ellipse 50% 40% at 80% 90%, rgba(118,255,3,0.02) 0%, transparent 60%),
-              radial-gradient(ellipse 40% 30% at 20% 80%, rgba(118,255,3,0.015) 0%, transparent 50%)
-            `
-          }}
-        />
         <ThemeProvider>
           <div className="relative z-10">
             {children}

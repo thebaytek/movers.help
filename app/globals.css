@@ -108,11 +108,12 @@
   }
 
   .green-glow {
-    box-shadow: 0 0 20px rgba(118, 255, 3, 0.15), 0 0 40px rgba(118, 255, 3, 0.08);
+    /* Retire marketing glow — keep class for compat */
+    box-shadow: none;
   }
 
   .green-glow-text {
-    text-shadow: 0 0 10px rgba(118, 255, 3, 0.6), 0 0 20px rgba(118, 255, 3, 0.3);
+    text-shadow: none;
   }
 
   .terminal-panel {
@@ -196,8 +197,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(118, 255, 3, 0.12); }
-  50% { box-shadow: 0 0 40px rgba(118, 255, 3, 0.25); }
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: none; }
 }
 
 @keyframes shimmer {
