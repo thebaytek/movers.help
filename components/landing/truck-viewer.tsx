@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Truck, ArrowRight, RotateCw, Info, Loader2 } from "lucide-react";
+import { Truck, ArrowRight, RotateCw, Info, Loader2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -15,6 +15,9 @@ import {
 } from "@/lib/truckConfig";
 import type { TruckConfig } from "@/types";
 import type { TruckCanvasHandle } from "@/components/truck/truck-canvas";
+import { Canvas, } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { FurnitureGeometry } from "@/components/truck/furniture-geometry";
 
 const TruckCanvas = dynamic(
   () => import("@/components/truck/truck-canvas"),
@@ -62,6 +65,9 @@ export function TruckViewer() {
     return Object.entries(map).map(([room, data]) => ({ room, ...data }));
   }, [positionedItems]);
 
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const previewItem = positionedItems.find((i) => i.id === selectedItem) ?? positionedItems[0];
+
   const scrollToQuote = useCallback(() => {
     const el = document.getElementById("quote");
     if (el) {
@@ -70,11 +76,7 @@ export function TruckViewer() {
   }, []);
 
   return (
-    <section id="truck-viewer" className="relative overflow-hidden py-20 sm:py-28">
-      <div className="absolute inset-0 opacity-30" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[#76ff03]/[0.03] blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-[#76ff03]/[0.03] blur-3xl" />
-
+    <section id="truck-viewer" className="relative py-20 sm:py-28">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -233,6 +235,78 @@ export function TruckViewer() {
                       {count} items &middot; {cuFt} cu ft
                     </span>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Master inventory list with 3D preview */}
+            <div className="rounded-2xl border border-surface-800 bg-surface-900 p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <Package className="w-4 h-4 text-surface-400" />
+                <span className="text-sm font-semibold text-surface-200">
+                  Inventory ({positionedItems.length})
+                </span>
+              </div>
+              {previewItem && (
+                <div className="flex gap-3 mb-3 rounded-xl border border-surface-800 bg-surface-950/60 p-3">
+                  <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-surface-950">
+                    <Canvas
+                      camera={{ position: [3.5, 2.8, 4.5], fov: 42 }}
+                      dpr={[1, 1.5]}
+                      gl={{ antialias: true, alpha: true }}
+                      style={{ background: "transparent" }}
+                    >
+                      <ambientLight intensity={0.9} />
+                      <directionalLight position={[4, 6, 4]} intensity={1.1} />
+                      <group>
+                        <FurnitureGeometry
+                          label={previewItem.label}
+                          dimensions={previewItem.dimensions}
+                          color={previewItem.color}
+                        />
+                      </group>
+                      <OrbitControls autoRotate autoRotateSpeed={2} enableZoom={false} enablePan={false} />
+                    </Canvas>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-surface-100 truncate">
+                      {previewItem.label}
+                    </div>
+                    <div className="text-[11px] text-surface-400 mt-0.5">
+                      {previewItem.room} &middot; {previewItem.cuFt} cu ft
+                    </div>
+                    <div className="text-[10px] text-surface-500 mt-1 tabular-nums">
+                      {previewItem.dimensions.map((d) => d.toFixed(1)).join(" × ")} ft
+                    </div>
+                    <div
+                      className="mt-2 h-1 rounded-full"
+                      style={{ backgroundColor: previewItem.color }}
+                    />
+                  </div>
+                </div>
+              )}
+              <div className="space-y-0.5 max-h-52 overflow-y-auto pr-1">
+                {positionedItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setSelectedItem(item.id)}
+                    className={`w-full flex items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${
+                      previewItem?.id === item.id
+                        ? "bg-surface-800"
+                        : "hover:bg-surface-800/50"
+                    }`}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="flex-1 text-[11px] text-surface-300 truncate">
+                      {item.label}
+                    </span>
+                    <span className="text-[10px] text-surface-500 tabular-nums">
+                      {item.cuFt} ft³
+                    </span>
+                  </button>
                 ))}
               </div>
             </div>
